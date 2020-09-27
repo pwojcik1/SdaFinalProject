@@ -1,4 +1,4 @@
-package external;
+package pl.sda.demo.external;
 
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package domain;
+package pl.sda.demo.domain;
 
 import lombok.*;
 

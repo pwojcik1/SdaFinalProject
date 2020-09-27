@@ -1,7 +1,5 @@
-package external;
+package pl.sda.demo.external;
 
-import domain.Recipe;
-import domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +25,6 @@ import java.util.Set;
         @OneToMany(mappedBy = "user")
         private Set<UserEntity> users;
         @OneToMany (mappedBy = "user")
-        private Set<Recipe>recipes;
+        private Set<RecipeEntity>recipes;
 
 }

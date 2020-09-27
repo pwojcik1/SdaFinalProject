@@ -1,14 +1,12 @@
-package external;
+package pl.sda.demo.external;
 
-import domain.Product;
-import domain.Recipe;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,9 +24,9 @@ public class UserEntity {
     private String login;
     private String password;
     @OneToMany (mappedBy = "recipe")
-    private Set<Recipe> favorite;
+    private Set<RecipeEntity> favorite;
     @OneToMany(mappedBy = "product")
-    private Set<Product> fridge;
+    private Set<ProductEntity> fridge;
 
 
 }
