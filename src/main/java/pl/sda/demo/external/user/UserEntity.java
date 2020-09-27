@@ -1,9 +1,11 @@
-package pl.sda.demo.external;
+package pl.sda.demo.external.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import pl.sda.demo.external.product.ProductEntity;
+import pl.sda.demo.external.recipe.RecipeEntity;
 
 import javax.persistence.*;
 import java.util.Set;

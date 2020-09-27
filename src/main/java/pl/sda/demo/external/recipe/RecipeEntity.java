@@ -1,6 +1,7 @@
-package pl.sda.demo.external;
+package pl.sda.demo.external.recipe;
 
 import lombok.*;
+import pl.sda.demo.external.product.ProductEntity;
 
 
 import javax.persistence.*;
