@@ -1,4 +1,4 @@
-package pl.sda.demo.domain;
+package pl.sda.demo.domain.recipe;
 
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package pl.sda.demo.external;
+package pl.sda.demo.external.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
