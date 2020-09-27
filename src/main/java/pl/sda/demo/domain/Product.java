@@ -10,12 +10,6 @@ import java.util.List;
 @Builder
 @Getter
 public class Product {
-
     private Integer id;
     private String name;
-
-
-
-
-
 }

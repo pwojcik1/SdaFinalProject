@@ -20,8 +20,8 @@ public class RecipeEntity {
     private String name;
     private String description;
     @ManyToMany
-    @JoinTable (name = "recipe_product"
-            , joinColumns = @JoinColumn (name = "recipeId")
+    @JoinTable(name = "recipe_product"
+            , joinColumns = @JoinColumn(name = "recipeId")
             , inverseJoinColumns = @JoinColumn(name = "productId"))
     private Set<ProductEntity> products;
 
