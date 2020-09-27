@@ -23,10 +23,16 @@ public class UserEntity {
     private Integer id;
     private String login;
     private String password;
-    @OneToMany (mappedBy = "recipe")
+    @ManyToMany
+    @JoinTable (name = "user_recipe"
+            , joinColumns = @JoinColumn (name = "userId")
+            , inverseJoinColumns = @JoinColumn(name = "recipeId"))
     private Set<RecipeEntity> favorite;
-    @OneToMany(mappedBy = "product")
-    private Set<ProductEntity> fridge;
+    @ManyToMany
+    @JoinTable (name = "user_product"
+            , joinColumns = @JoinColumn (name = "userId")
+            , inverseJoinColumns = @JoinColumn(name = "productId"))
+    private Set<ProductEntity> products;
 
 
 }

@@ -19,7 +19,10 @@ public class RecipeEntity {
     private Integer id;
     private String name;
     private String description;
-    @OneToMany(mappedBy = "recipe")
+    @ManyToMany
+    @JoinTable (name = "recipe_product"
+            , joinColumns = @JoinColumn (name = "recipeId")
+            , inverseJoinColumns = @JoinColumn(name = "productId"))
     private Set<ProductEntity> products;
 
 }

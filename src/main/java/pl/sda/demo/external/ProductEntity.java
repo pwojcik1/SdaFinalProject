@@ -22,9 +22,7 @@ import java.util.Set;
         private Integer id;
         private String name;
 
-        @OneToMany(mappedBy = "user")
         private Set<UserEntity> users;
-        @OneToMany (mappedBy = "user")
         private Set<RecipeEntity>recipes;
 
 }
