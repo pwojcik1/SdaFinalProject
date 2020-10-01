@@ -12,6 +12,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Entity
+@ToString
 @Table(name = "recipes")
 public class RecipeEntity {
 
