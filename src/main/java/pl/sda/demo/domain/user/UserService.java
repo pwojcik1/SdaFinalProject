@@ -3,6 +3,7 @@ package pl.sda.demo.domain.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.sda.demo.domain.product.Product;
+import pl.sda.demo.domain.recipe.Recipe;
 
 @Service
 @RequiredArgsConstructor
@@ -45,20 +46,27 @@ public class UserService {
         userRepository.removeProductFromFridge(id, user);
     }
 
-    void updateProductInFridge(Product product, User user) {
-        userRepository.getProductFromFridgeByName(product.getName(), user)
-                .filter(p -> !p.getId().equals(product.getId()))
-                .ifPresent(product1 -> {
-                    throw new IllegalStateException("Cannot update product with different id");
-                });
-        userRepository.updateProductInFridge(product, user);
-    }
+//    void updateProductInFridge(Product product, User user) {
+//        userRepository.getProductFromFridgeByName(product.getName(), user)
+//                .filter(p -> !p.getId().equals(product.getId()))
+//                .ifPresent(product1 -> {
+//                    throw new IllegalStateException("Cannot update product with different id");
+//                });
+//        userRepository.updateProductInFridge(product, user);
+//    }
 
-    void addRecipeToFavourites(int id, User user) {
-        if (user.getRecipeId().contains(id)) {
+    void addRecipeToFavourites(Recipe recipe, User user) {
+        if (user.getRecipeId().contains(recipe.getId())) {
             throw new IllegalStateException("Recipe already in favourites");
         }
-        userRepository.addRecipeToFavourites(id, user);
+        userRepository.addRecipeToFavourites(recipe, user);
+    }
+
+    void deleteRecipeFromFavourites(int id, User user) {
+        if (!user.getRecipeId().contains(id)) {
+            throw new IllegalStateException("Recipe already in favourites");
+        }
+        userRepository.deleteRecipeFromFavourites(id, user);
     }
 
 }
