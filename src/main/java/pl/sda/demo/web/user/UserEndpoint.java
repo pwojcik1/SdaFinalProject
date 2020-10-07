@@ -8,7 +8,6 @@ import pl.sda.demo.domain.user.User;
 import pl.sda.demo.domain.user.UserService;
 import pl.sda.demo.external.user.DatabaseUserRepository;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -20,7 +19,7 @@ public class UserEndpoint {
     private final DatabaseUserRepository databaseUserRepository;
 
     @PostMapping
-    void createUser(@RequestBody @Valid User user) {
+    void createUser(@RequestBody User user) {
         userService.createUser(user);
     }
 
@@ -35,7 +34,7 @@ public class UserEndpoint {
     }
 
     @PostMapping
-    void addProductToFridge(@RequestBody @Valid Product product, User user) {
+    void addProductToFridge(@RequestBody Product product, User user) {
         userService.addProductToFridge(product, user);
     }
 
