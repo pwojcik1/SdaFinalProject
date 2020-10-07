@@ -6,8 +6,10 @@ import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.domain.user.User;
 import pl.sda.demo.domain.user.UserService;
+import pl.sda.demo.external.user.DatabaseUserRepository;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -15,6 +17,7 @@ import javax.validation.Valid;
 public class UserEndpoint {
 
     private final UserService userService;
+    private final DatabaseUserRepository databaseUserRepository;
 
     @PostMapping
     void createUser(@RequestBody @Valid User user) {
@@ -49,5 +52,10 @@ public class UserEndpoint {
     @DeleteMapping
     void deleteRecipeFromFavourites(@RequestParam int id, @RequestBody User user) {
         userService.deleteRecipeFromFavourites(id, user);
+    }
+
+    @GetMapping("/{username}")
+    Optional<User> findByUserName(@RequestParam String username) {
+        return databaseUserRepository.findByUsername(username);
     }
 }

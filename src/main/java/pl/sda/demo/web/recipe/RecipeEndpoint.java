@@ -29,7 +29,6 @@ public class RecipeEndpoint {
     @DeleteMapping
     void deleteRecipeFromDb(@RequestParam int id) {
         recipeService.deleteRecipeFromDb(id);
-
     }
 
     @GetMapping("/{name}")
@@ -37,7 +36,7 @@ public class RecipeEndpoint {
         return recipeService.findByRecipeName(name);
     }
 
-    @GetMapping
+    @GetMapping("{products}")
     Set<Recipe> findByProducts(@RequestParam List<Product> products) {
         return recipeService.findByProducts(products);
     }
