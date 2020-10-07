@@ -11,7 +11,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    void createUser(User user) {
+   public void createUser(User user) {
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(u -> {
                     throw new IllegalStateException("Username already taken");
@@ -19,7 +19,7 @@ public class UserService {
         userRepository.createUser(user);
     }
 
-    void updateUser(User user) {
+    public void updateUser(User user) {
         userRepository.findByUsername(user.getUsername())
                 .filter(u -> !u.getId().equals(user.getId()))
                 .ifPresent(user1 -> {
@@ -28,18 +28,18 @@ public class UserService {
         userRepository.updateUser(user);
     }
 
-    void deleteUser(int id) {
+    public void deleteUser(int id) {
         userRepository.deleteUser(id);
     }
 
-    void addProductToFridge(Product product, User user) {
+    public void addProductToFridge(Product product, User user) {
         if (user.getProductId().contains(product.getId())) {
             throw new IllegalStateException("Product already in fridge");
         }
         userRepository.addProductToFridge(product, user);
     }
 
-    void removeProductFromFridge(int id, User user) {
+    public void removeProductFromFridge(int id, User user) {
         if (!user.getProductId().contains(id)) {
             throw new IllegalStateException("You dont have this product in your fridge");
         }
@@ -55,14 +55,14 @@ public class UserService {
 //        userRepository.updateProductInFridge(product, user);
 //    }
 
-    void addRecipeToFavourites(Recipe recipe, User user) {
+    public void addRecipeToFavourites(Recipe recipe, User user) {
         if (user.getRecipeId().contains(recipe.getId())) {
             throw new IllegalStateException("Recipe already in favourites");
         }
         userRepository.addRecipeToFavourites(recipe, user);
     }
 
-    void deleteRecipeFromFavourites(int id, User user) {
+    public void deleteRecipeFromFavourites(int id, User user) {
         if (!user.getRecipeId().contains(id)) {
             throw new IllegalStateException("Recipe already in favourites");
         }

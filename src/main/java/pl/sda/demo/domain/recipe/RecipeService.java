@@ -12,7 +12,7 @@ import java.util.Set;
 public class RecipeService {
     private final RecipeRepository recipeRepository;
 
-    void addRecipeToDb(Recipe recipe) {
+   public void addRecipeToDb(Recipe recipe) {
         recipeRepository.findByRecipeName(recipe.getName())
                 .ifPresent(r -> {
                     throw new IllegalStateException("Recipe with same name already exists");
@@ -20,7 +20,7 @@ public class RecipeService {
         recipeRepository.addRecipeToDb(recipe);
     }
 
-    void updateRecipeInDb(Recipe recipe) {
+    public void updateRecipeInDb(Recipe recipe) {
         recipeRepository.findByRecipeName(recipe.getName())
                 .filter(r -> !r.getId().equals(recipe.getId()))
                 .ifPresent(recipe1 -> {
@@ -29,15 +29,15 @@ public class RecipeService {
         recipeRepository.updateRecipeInDb(recipe);
     }
 
-    void deleteRecipeFromDb(int id) {
+    public void deleteRecipeFromDb(int id) {
         recipeRepository.deleteRecipeFromDb(id);
     }
 
-    Recipe findByRecipeName(String name) {
+    public Recipe findByRecipeName(String name) {
         return recipeRepository.findByRecipeName(name).orElseThrow(() -> new IllegalArgumentException("recipe with given name doesnt exist"));
     }
 
-    Set<Recipe> findByProducts(List<Product> products) {
+    public Set<Recipe> findByProducts(List<Product> products) {
         return recipeRepository.findByProducts(products);
     }
 }

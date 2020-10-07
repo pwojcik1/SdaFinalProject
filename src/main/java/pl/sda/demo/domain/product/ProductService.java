@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    void addProductToLibrary(Product product) {
+    public void addProductToLibrary(Product product) {
         productRepository.getProductByName(product.getName())
                 .ifPresent((p -> {
                     throw new IllegalStateException("Product with same name already exists");
@@ -16,7 +16,7 @@ public class ProductService {
         productRepository.addProductToLibrary(product);
     }
 
-    void updateProductInLibrary(Product product) {
+    public void updateProductInLibrary(Product product) {
         productRepository.getProductByName(product.getName())
                 .filter(p -> !p.getId().equals(product.getId()))
                 .ifPresent(product1 -> {
@@ -25,7 +25,7 @@ public class ProductService {
         productRepository.updateProductInLibrary(product);
     }
 
-    void deleteProductFromLibrary(int id) {
+    public void deleteProductFromLibrary(int id) {
         productRepository.deleteProductFromLibrary(id);
     }
 }
