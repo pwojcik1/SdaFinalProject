@@ -68,5 +68,4 @@ public class UserService {
         }
         userRepository.deleteRecipeFromFavourites(id, user);
     }
-
 }
