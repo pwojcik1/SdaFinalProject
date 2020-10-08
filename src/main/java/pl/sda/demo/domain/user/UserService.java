@@ -46,15 +46,6 @@ public class UserService {
         userRepository.removeProductFromFridge(id, user);
     }
 
-//    void updateProductInFridge(Product product, User user) {
-//        userRepository.getProductFromFridgeByName(product.getName(), user)
-//                .filter(p -> !p.getId().equals(product.getId()))
-//                .ifPresent(product1 -> {
-//                    throw new IllegalStateException("Cannot update product with different id");
-//                });
-//        userRepository.updateProductInFridge(product, user);
-//    }
-
     public void addRecipeToFavourites(Recipe recipe, User user) {
         if (user.getRecipeId().contains(recipe.getId())) {
             throw new IllegalStateException("Recipe already in favourites");
@@ -64,7 +55,7 @@ public class UserService {
 
     public void deleteRecipeFromFavourites(int id, User user) {
         if (!user.getRecipeId().contains(id)) {
-            throw new IllegalStateException("Recipe already in favourites");
+            throw new IllegalStateException("Recipe is not in favourites");
         }
         userRepository.deleteRecipeFromFavourites(id, user);
     }

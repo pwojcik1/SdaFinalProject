@@ -16,8 +16,6 @@ public interface UserRepository {
 
     void removeProductFromFridge(int id, User user);
 
-//    void updateProductInFridge(Product product, User user);
-
     void addRecipeToFavourites(Recipe recipe, User user);
 
     void deleteRecipeFromFavourites(int id, User user);
