@@ -12,7 +12,7 @@ import java.util.Set;
 public class RecipeService {
     private final RecipeRepository recipeRepository;
 
-   public void addRecipeToDb(Recipe recipe) {
+    public void addRecipeToDb(Recipe recipe) {
         recipeRepository.findByRecipeName(recipe.getName())
                 .ifPresent(r -> {
                     throw new IllegalStateException("Recipe with same name already exists");
@@ -21,7 +21,7 @@ public class RecipeService {
     }
 
     public void updateRecipeInDb(Recipe recipe) {
-        recipeRepository.findByRecipeName(recipe.getName())
+        recipeRepository.findByRecipeId(recipe.getId())
                 .filter(r -> !r.getId().equals(recipe.getId()))
                 .ifPresent(recipe1 -> {
                     throw new IllegalStateException("Cannot update product with different id");
@@ -34,7 +34,7 @@ public class RecipeService {
     }
 
     public Recipe findByRecipeName(String name) {
-        return recipeRepository.findByRecipeName(name).orElseThrow(() -> new IllegalArgumentException("recipe with given name doesnt exist"));
+        return recipeRepository.findByRecipeName(name).orElseThrow(() -> new IllegalStateException("recipe with given name doesnt exist"));
     }
 
     public Set<Recipe> findByProducts(List<Product> products) {

@@ -16,5 +16,7 @@ public interface RecipeRepository {
 
     Optional<Recipe> findByRecipeName(String name);
 
+    Optional<Recipe> findByRecipeId(int id);
+
     Set<Recipe> findByProducts(List<Product> products);
 }

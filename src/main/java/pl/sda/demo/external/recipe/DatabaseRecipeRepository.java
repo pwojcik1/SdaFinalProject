@@ -56,6 +56,17 @@ public class DatabaseRecipeRepository implements RecipeRepository {
     }
 
     @Override
+    public Optional<Recipe> findByRecipeId(int id) {
+        return jpaRecipeRepository.findById(id)
+                .map(recipeEntity -> Recipe.builder()
+                .id(recipeEntity.getId())
+                .name(recipeEntity.getName())
+                .description(recipeEntity.getDescription())
+                .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
+                .build());
+    }
+
+    @Override
     public Set<Recipe> findByProducts(List<Product> products) {
         Set<ProductEntity> productEntities = products.stream().map(p -> ProductEntity.builder()
                 .id(p.getId())
