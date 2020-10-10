@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -13,7 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-   public void createUser(User user) {
+    public void createUser(User user) {
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(u -> {
                     throw new IllegalStateException("Username already taken");
@@ -62,5 +65,13 @@ public class UserService {
             throw new IllegalStateException("Recipe is not in favourites");
         }
         userRepository.deleteRecipeFromFavourites(id, user);
+    }
+
+    public List<Product> getAllProductsFromFridge(String username) {
+        return userRepository.getAllProductsFromFridge(username);
+    }
+
+    public User findByUsername(String username){
+        return userRepository.findByUsername(username).orElseThrow(()-> new IllegalArgumentException("Wrong username"));
     }
 }

@@ -23,4 +23,7 @@ public interface JpaProductRepository extends JpaRepository<ProductEntity, Integ
 
     @Query("select p from ProductEntity p where p.name =:name")
     Optional<ProductEntity> getProductByName(@Param("name") String name);
+
+    @Query("select u.products from UserEntity u where u.username =:name")
+    List<ProductEntity> getAllProductsFromFridge(@Param("name") String name);
 }

@@ -15,21 +15,20 @@
     </thead>
     <tbody>
     <tr th:each="recipe, iterStat : ${recipes}" th:class="${iterStat.odd} ? 'odd' : 'even'">
-        <td><span th:text="${recipe.name}"></span></td>
-        <td><span th:text="${recipe.description}"></span></td>
-<!--    <tr th:each="product, iterStat : ${recipe.productId}" th:class="${iterStat.odd} ? 'odd' : 'even'">-->
-<!--        <td><span th:text="${product}"></span></td>-->
-<!--    </tr>-->
-
-        <div sec:authorize="hasRole('ADMIN')">
-            <td><a th:href="@{/product/addOrUpdate?id=} + ${recipe.id}">Edytuj</a></td>
-            <td><a th:href="@{/product/delete?id=} + ${recipe.id}">Usuń</a></td>
-        </div>
+        <td><span th:text="${recipe.recipeName}"></span></td>
+        <td><span th:text="${recipe.recipeDescription}"></span></td>
+        <td>
+        <span th:each="product, iterStat : ${recipe.productNames}" th:text="${product}"></span></td>
+    </td>
+    <div sec:authorize="hasRole('ADMIN')">
+        <td><a th:href="@{/recipe/update?id=} + ${recipe.recipeId}">Edytuj</a></td>
+        <td><a th:href="@{/recipe/delete?id=} + ${recipe.recipeId}">Usuń</a></td>
+    </div>
     </tr>
     </tbody>
 </table>
 <div sec:authorize="hasRole('ADMIN')">
-    <p><a th:href="@{/recipe/addOrUpdate}">Dodaj przepis</a></p>
+    <p><a th:href="@{/recipe/add}">Dodaj przepis</a></p>
 </div>
 </body>
 </html>

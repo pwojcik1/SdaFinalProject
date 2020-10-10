@@ -3,6 +3,7 @@ package pl.sda.demo.domain.user;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -21,6 +22,8 @@ public interface UserRepository {
     void deleteRecipeFromFavourites(int id, User user);
 
     Optional<User> findByUsername(String username);
+
+    List<Product> getAllProductsFromFridge(String username);
 
     Optional<Product> getProductFromFridgeByName(String name, User user);
 }

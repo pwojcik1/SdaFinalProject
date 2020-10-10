@@ -17,14 +17,14 @@
         <td><span th:text="${product.name}"></span></td>
 
         <div sec:authorize="hasRole('ADMIN')">
-    <td><a th:href="@{/product/addOrUpdate?id=} + ${product.id}">Edytuj</a></td>
+    <td><a th:href="@{/product/update?id=} + ${product.id}">Edytuj</a></td>
     <td><a th:href="@{/product/delete?id=} + ${product.id}">Usuń</a></td>
         </div>
 </tr>
 </tbody>
 </table>
 <div sec:authorize="hasRole('ADMIN')">
-    <p><a th:href="@{/product/addOrUpdate}">Dodaj produkt</a></p>
+    <p><a th:href="@{/product/add}">Dodaj produkt</a></p>
 </div>
 </body>
 </html>

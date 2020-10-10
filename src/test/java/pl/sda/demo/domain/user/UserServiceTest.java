@@ -3,6 +3,7 @@ package pl.sda.demo.domain.user;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    private final PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserRepository userRepository = Mockito.mock(UserRepository.class);
     private final UserService userService = new UserService(userRepository, passwordEncoder);
     private final ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
@@ -61,7 +62,8 @@ class UserServiceTest {
         Mockito.verify(userRepository).findByUsername("username");
         assertEquals(1, result.getId());
         assertEquals("username", result.getUsername());
-//        assertEquals("newPassword", result.getPassword()); Jak zamockowac encodePassword
+
+//        assertEquals("newPassword", result.getPassword()); Jak zamockowac encodePassword  .matches
     }
 
     @Test

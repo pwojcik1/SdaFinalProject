@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:replace="fragments/header :: navigation"></div>
+<table>
+    <thead class="header">
+    <td>Nazwa</td>
+
+    </thead>
+    <tbody>
+    <tr th:each="product, iterStat : ${fridge}" th:class="${iterStat.odd} ? 'odd' : 'even'">
+        <td><span th:text="${product.name}"></span></td>
+        <td><a th:href="@{/user/delete?id=} + ${product.id}">Usuń</a></td>
+
+    </tr>
+    </tbody>
+</table>
+
+<p><a th:href="@{/user/add}">Dodaj produkt do lodowki</a></p>
+
+</body>
+</html>

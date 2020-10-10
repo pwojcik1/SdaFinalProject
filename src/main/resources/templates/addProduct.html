@@ -6,11 +6,8 @@
 </head>
 <body>
 <div th:replace="fragments/header :: navigation"></div>
-<form method="post" th:action="@{/product/addOrUpdate}" th:object="${product}">
-    <input type="hidden" th:field="*{id}"/>
-    Nazwa: <input type="text" th:field="*{name}"/>
-    <span class="error" th:if="${#fields.hasErrors('*{name}')}" th:errors="*{name}"/><br>
-
+<form method="post" th:action="@{/product/add}" th:object="${product}">
+    Nazwa: <input type="text" th:field="*{name}"/><br>
     <input type="submit" value="Zapisz"/>
 </form>
 </body>

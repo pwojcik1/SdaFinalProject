@@ -11,7 +11,9 @@ import pl.sda.demo.external.product.ProductEntity;
 import pl.sda.demo.external.recipe.JpaRecipeRepository;
 import pl.sda.demo.external.recipe.RecipeEntity;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -64,11 +66,10 @@ public class DatabaseUserRepository implements UserRepository {
         Optional<UserEntity> userEntity = jpaUserRepository.findById(user.getId());
         Optional<ProductEntity> productEntity = jpaProductRepository.findProductById(id);
         userEntity.ifPresent(ent -> {
-            if(productEntity.isPresent()){
+            if (productEntity.isPresent()) {
                 ent.getProducts().remove(productEntity.get());
                 jpaUserRepository.save(ent);
-            }
-            else {
+            } else {
                 throw new IllegalStateException("You cannot remove nonexistent product");
             }
         });
@@ -108,6 +109,7 @@ public class DatabaseUserRepository implements UserRepository {
                         .id(ent.getId())
                         .username(ent.getUsername())
                         .password(ent.getPassword())
+                        .role(ent.getRole())
                         .productId(jpaProductRepository.findAllProductsIdFromCollection(ent.getProducts()))
                         .recipeId(jpaRecipeRepository.findAllRecipesIdFromCollection(ent.getFavourites()))
                         .build());
@@ -127,5 +129,13 @@ public class DatabaseUserRepository implements UserRepository {
             throw new IllegalStateException("You dont have this product in fridge");
         }
         throw new IllegalStateException("Product with given name doesnt exist");
+    }
+
+    @Override
+    public List<Product> getAllProductsFromFridge(String username) {
+        return jpaProductRepository.getAllProductsFromFridge(username)
+                .stream()
+                .map(ent -> new Product(ent.getId(), ent.getName()))
+                .collect(Collectors.toList());
     }
 }

@@ -26,17 +26,6 @@ public class ProductController {
         return mav;
     }
 
-    @GetMapping("/addOrUpdate")
-    @PreAuthorize("hasRole('ADMIN')")
-    ModelAndView addProduct(@RequestParam(name = "id", required = false) Integer id) {
-        ModelAndView mav = new ModelAndView("addProduct.html");
-        if (id != null) {
-            mav.addObject("product", productService.getOne(id));
-        } else {
-            mav.addObject("patient", new Product());
-        }
-        return mav;
-    }
 
     @GetMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
@@ -45,14 +34,33 @@ public class ProductController {
         return "redirect:/product";
     }
 
-    @PostMapping("/addOrUpdate")
+    @GetMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    String addOrUpdateProduct(@ModelAttribute @Valid Product product) {
-        if (product.getId() == null) {
-            productService.addProductToLibrary(product);
-        } else {
-            productService.updateProductInLibrary(product);
-        }
+    ModelAndView addDoctorPage() {
+        ModelAndView mav = new ModelAndView("addProduct.html");
+        mav.addObject("product", new Product());
+        return mav;
+    }
+
+    @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
+    String addNewDoctor(@ModelAttribute Product product) {
+        productService.addProductToLibrary(product);
+        return "redirect:/product";
+    }
+
+    @GetMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
+    ModelAndView addProduct(@RequestParam(name = "id") Integer id) {
+        ModelAndView mav = new ModelAndView("updateProduct.html");
+        mav.addObject("product", productService.getOne(id));
+        return mav;
+    }
+
+    @PostMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
+    String addOrUpdateProduct(@ModelAttribute Product product) {
+        productService.updateProductInLibrary(product);
         return "redirect:/product";
     }
 }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:replace="fragments/header :: navigation"></div>
+<form method="post" th:action="@{/recipe/add}" th:object="${recipe}">
+    Nazwa: <input type="text" th:field="*{name}"/><br>
+    Opis: <input type="text" th:field="*{description}"/><br>
+
+    Produkt: <select th:field="*{productId}" multiple="multiple">
+    <option
+            th:each="product : ${products}"
+            th:value="${product.id}"
+            th:text="${product.name}"></option>
+</select>
+    <input type="submit" value="Zapisz"/>
+</form>
+</body>
+</html>
+

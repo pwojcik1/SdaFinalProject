@@ -8,6 +8,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 public class Product {

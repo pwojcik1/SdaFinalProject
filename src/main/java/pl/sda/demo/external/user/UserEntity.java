@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Entity
+@Setter
 @ToString
 @Table(name = "users")
 public class UserEntity {
