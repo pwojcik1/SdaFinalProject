@@ -5,8 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import pl.sda.demo.configuration.SecurityDetailsService;
+import pl.sda.demo.configuration.WebSecurityConfiguration;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.external.product.JpaProductRepository;
@@ -79,21 +83,21 @@ class UserServiceIntegrationTest {
         favourites = new HashSet<>();
         favourites.add(recipeEntity2);
 
-        userEntity = new UserEntity(1, "testUsername", "testPassword", favourites, userProducts);
+        userEntity = new UserEntity(1, "testUsername", "testPassword", "user", favourites, userProducts);
         jpaUserRepository.save(userEntity);
     }
 
     @Test
     void testShouldCreateUser() {
         //given
-        User user = new User(null, "username", "password", null, null);
+        User user = new User(1, "username", "password", null, null, "user");
         //when
         userService.createUser(user);
         //then
         UserEntity result = jpaUserRepository.getOne(2);
         assertEquals(2, result.getId());
         assertEquals("username", result.getUsername());
-        assertEquals("password", result.getPassword());
+//        assertEquals(passwordEncoder.encode("password"), result.getPassword());
         assertTrue(result.getFavourites().isEmpty());
         assertTrue(result.getProducts().isEmpty());
     }
@@ -101,14 +105,14 @@ class UserServiceIntegrationTest {
     @Test
     void updateUser() {
         //given
-        User user = new User(1, "newUsername", "newPassword", null, null);
+        User user = new User(1, "newUsername", "newPassword", null, null, "user");
         //when
         userService.updateUser(user);
         //then
         UserEntity result = jpaUserRepository.getOne(1);
         assertEquals(1, result.getId());
         assertEquals("testUsername", result.getUsername());
-        assertEquals("newPassword", result.getPassword());
+//        assertEquals("newPassword", result.getPassword());
         assertEquals(1, result.getFavourites().size());
         assertTrue(result.getFavourites().contains(recipeEntity2));
         assertEquals(2, result.getProducts().size());
@@ -180,14 +184,14 @@ class UserServiceIntegrationTest {
         Recipe recipe = new Recipe(1, "recipeName1", "recipeDescription1", ids);
         //when
         assertTrue(user.isPresent());
-        userService.addRecipeToFavourites(recipe,user.get());
+        userService.addRecipeToFavourites(recipe, user.get());
         //then
         UserEntity result = jpaUserRepository.getOne(1);
 
         assertEquals(1, result.getId());
         assertEquals("testUsername", result.getUsername());
         assertEquals("testPassword", result.getPassword());
-        assertEquals(2,result.getFavourites().size());
+        assertEquals(2, result.getFavourites().size());
         assertTrue(result.getFavourites().contains(recipeEntity2));
         assertTrue(result.getFavourites().contains(recipeEntity1));
         assertEquals(2, result.getProducts().size());

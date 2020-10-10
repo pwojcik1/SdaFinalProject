@@ -5,7 +5,10 @@ import org.springframework.stereotype.Component;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class DatabaseProductRepository implements ProductRepository {
                     jpaProductRepository.save(productEntity);
                 });
     }
+
     @Override
     public void deleteProductFromLibrary(int id) {
         jpaProductRepository.deleteById(id);
@@ -40,5 +44,23 @@ public class DatabaseProductRepository implements ProductRepository {
                         .id(productEntity.getId())
                         .name(productEntity.getName())
                         .build());
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return jpaProductRepository.findAll().stream().map(ent -> new Product(ent.getId(), ent.getName())).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Product> getOne(int id) {
+        return jpaProductRepository.findById(id).map(ent-> new Product(ent.getId(), ent.getName()));
+    }
+
+    @Override
+    public List<Product> getAllProductsByIds(List<Integer> ids) {
+        return jpaProductRepository.findAllProductsByIdInList(ids).stream().map(productEntity -> Product.builder()
+                .id(productEntity.getId())
+                .name(productEntity.getName())
+                .build()).collect(Collectors.toList());
     }
 }

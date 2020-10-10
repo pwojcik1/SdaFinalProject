@@ -21,6 +21,7 @@ public class UserEntity {
     private Integer id;
     private String username;
     private String password;
+    private String role;
 
     @ManyToMany
     @JoinTable(name = "user_recipe",

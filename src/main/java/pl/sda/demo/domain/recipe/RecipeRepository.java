@@ -19,4 +19,6 @@ public interface RecipeRepository {
     Optional<Recipe> findByRecipeId(int id);
 
     Set<Recipe> findByProducts(List<Product> products);
+
+    List<Recipe> getAllRecipes();
 }

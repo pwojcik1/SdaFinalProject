@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="navigation">
+    <h1>Wyszukiwarka przepisow</h1>
+
+    <div sec:authorize="isAuthenticated()">
+        <ul>
+            <li><a th:href="@{/product}">Produkty</a></li>
+            <li><a th:href="@{/recipe}">Przepisy</a></li>
+            <li><a th:href="@{/user}">Uzytkownik</a></li>
+        </ul>
+    </div>
+
+    <div sec:authorize="isAuthenticated()">
+        <p>Jesteś zalogowany jako <span sec:authentication="name"></span></p>
+        <form method="post" th:action="@{/logout}">
+            <input type="submit" value="Wyloguj"/>
+        </form>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Zaloguj się</a>
+        <a th:href="@{/register}">Zarejestruj się</a>
+    </div>
+</div>
+</body>
+</html>

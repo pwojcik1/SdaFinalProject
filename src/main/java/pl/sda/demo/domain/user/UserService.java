@@ -1,6 +1,7 @@
 package pl.sda.demo.domain.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
@@ -10,12 +11,14 @@ import pl.sda.demo.domain.recipe.Recipe;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
    public void createUser(User user) {
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(u -> {
                     throw new IllegalStateException("Username already taken");
                 });
+        user.encodePassword(passwordEncoder, user.getPassword());
         userRepository.createUser(user);
     }
 
@@ -25,6 +28,7 @@ public class UserService {
                 .ifPresent(user1 -> {
                     throw new IllegalStateException("Cannot update user with different id");
                 });
+        user.encodePassword(passwordEncoder, user.getPassword());
         userRepository.updateUser(user);
     }
 

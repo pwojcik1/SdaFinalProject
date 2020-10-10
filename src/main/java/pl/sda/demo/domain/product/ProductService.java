@@ -3,6 +3,8 @@ package pl.sda.demo.domain.product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -27,5 +29,16 @@ public class ProductService {
 
     public void deleteProductFromLibrary(int id) {
         productRepository.deleteProductFromLibrary(id);
+    }
+
+    public List<Product> getAllProducts(){
+       return productRepository.getAllProducts();
+    }
+
+    public Product getOne(int id){
+        return productRepository.getOne(id).orElseThrow(() -> new IllegalStateException("Product with given id doesnt exist"));
+    }
+    public List<Product> findAllProductsByIds(List<Integer> ids){
+        return productRepository.getAllProductsByIds(ids);
     }
 }

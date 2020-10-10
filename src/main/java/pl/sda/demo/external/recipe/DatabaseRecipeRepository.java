@@ -83,4 +83,14 @@ public class DatabaseRecipeRepository implements RecipeRepository {
                         .build())
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public List<Recipe> getAllRecipes() {
+        return jpaRecipeRepository.findAll().stream().map(recipeEntity -> Recipe.builder()
+                .id(recipeEntity.getId())
+                .name(recipeEntity.getName())
+                .description(recipeEntity.getDescription())
+                .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
+                .build() ).collect(Collectors.toList());
+    }
 }

@@ -25,6 +25,7 @@ public class DatabaseUserRepository implements UserRepository {
         UserEntity userEntity = UserEntity.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
+                .role(user.getRole())
                 .favourites(jpaRecipeRepository.findAllRecipesByIdInCollection(user.getRecipeId()))
                 .products(jpaProductRepository.findAllProductsByIdInList(user.getProductId()))
                 .build();

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post" th:action="@{/register}" th:object="${user}">
+    Login: <input type="text" th:field="*{username}"/><br>
+    Hasło: <input type="password" th:field="*{password}"/><br>
+    Rola: <select th:field="*{role}">
+    <option value="ADMIN">admin</option>
+    <option value="USER">user</option>
+</select><br>
+    <input type="submit" value="Zapisz"/>
+</form>
+</body>
+</html>

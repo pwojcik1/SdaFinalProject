@@ -40,5 +40,13 @@ public class RecipeService {
     public Set<Recipe> findByProducts(List<Product> products) {
         return recipeRepository.findByProducts(products);
     }
+
+    public Recipe getOne(int id){
+        return recipeRepository.findByRecipeId(id).orElseThrow(() -> new IllegalStateException("Recipe with given id doesnt exist"));
+    }
+
+    public List<Recipe> getAllRecipes(){
+        return recipeRepository.getAllRecipes();
+    }
 }
 

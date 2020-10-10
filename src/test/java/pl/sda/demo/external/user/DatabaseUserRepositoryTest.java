@@ -25,7 +25,7 @@ class DatabaseUserRepositoryTest {
     @Test
     void testShouldPersistNewUser() {
         //given
-        User user = new User(null, "user", "password", new ArrayList<>(), new ArrayList<>());
+        User user = new User(null, "user", "password", new ArrayList<>(), new ArrayList<>(),"user");
         //when
         Mockito.when(jpaRecipeRepository.findAllRecipesByIdInCollection(user.getRecipeId())).thenReturn(new HashSet<>());
         Mockito.when(jpaProductRepository.findAllProductsByIdInList(user.getProductId())).thenReturn(new HashSet<>());
@@ -47,8 +47,8 @@ class DatabaseUserRepositoryTest {
     @Test
     void testShouldUpdateUser() {
         //given
-        User user = new User(2, "user", "newPassword", new ArrayList<>(), new ArrayList<>());
-        UserEntity userEntity = new UserEntity(2, "user", "password", new HashSet<>(), new HashSet<>());
+        User user = new User(2, "user", "newPassword", new ArrayList<>(), new ArrayList<>(),"user");
+        UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), new HashSet<>());
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
 
@@ -71,8 +71,8 @@ class DatabaseUserRepositoryTest {
         //given
         Product product = new Product(null, "Egg");
         ProductEntity productEntity = new ProductEntity(null, "Egg");
-        User user = new User(2, "user", "password", new ArrayList<>(), new ArrayList<>());
-        UserEntity userEntity = new UserEntity(2, "user", "password", new HashSet<>(), new HashSet<>());
+        User user = new User(2, "user", "password", new ArrayList<>(), new ArrayList<>(),"user");
+        UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), new HashSet<>());
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
 
@@ -98,7 +98,7 @@ class DatabaseUserRepositoryTest {
         productsId.add(3);
         productsId.add(3);
 
-        User user = new User(2, "user", "password", new ArrayList<>(), productsId);
+        User user = new User(2, "user", "password", new ArrayList<>(), productsId,"user");
 
         ProductEntity productEntity = new ProductEntity(3, "Egg");
         ProductEntity productEntity2 = new ProductEntity(3, "Butter");
@@ -107,7 +107,7 @@ class DatabaseUserRepositoryTest {
         products.add(productEntity);
         products.add(productEntity2);
 
-        UserEntity userEntity = new UserEntity(2, "user", "password", new HashSet<>(), products);
+        UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), products);
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
         Mockito.when(jpaProductRepository.findProductById(3)).thenReturn(Optional.of(productEntity));
@@ -131,8 +131,8 @@ class DatabaseUserRepositoryTest {
     @Test
     void testShouldThrowExceptionForNonexistentProduct(){
         //given
-        User user = new User(2, "user", "password", new ArrayList<>(), new ArrayList<>());
-        UserEntity userEntity = new UserEntity(2, "user", "password", new HashSet<>(), new HashSet<>());
+        User user = new User(2, "user", "password", new ArrayList<>(), new ArrayList<>(),"user");
+        UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), new HashSet<>());
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
         Mockito.when(jpaProductRepository.findProductById(3)).thenReturn(Optional.empty());
@@ -160,9 +160,9 @@ class DatabaseUserRepositoryTest {
         Recipe recipe = new Recipe(1, "testName", "restDescription", productId);
         RecipeEntity recipeEntity = new RecipeEntity(1, "testName", "restDescription", productEntities);
 
-        User user = new User(1, "user", "password", new ArrayList<>(), new ArrayList<>());
+        User user = new User(1, "user", "password", new ArrayList<>(), new ArrayList<>(),"user");
 
-        UserEntity userEntity = new UserEntity(1, "user", "password", new HashSet<>(), new HashSet<>());
+        UserEntity userEntity = new UserEntity(1, "user", "password","user", new HashSet<>(), new HashSet<>());
         //when
         Mockito.when(jpaProductRepository.findAllProductsByIdInList(recipe.getProductId())).thenReturn(productEntities);
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
