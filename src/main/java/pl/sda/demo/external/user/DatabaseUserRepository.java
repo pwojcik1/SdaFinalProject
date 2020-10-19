@@ -91,14 +91,18 @@ public class DatabaseUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteRecipeFromFavourites(int id, User user) {
+    public void deleteRecipeFromFavourites(int id, User user) {  //test do tego poprawic
         UserEntity userEntity = jpaUserRepository.getOne(user.getId());
         Optional<RecipeEntity> recipeEntity = jpaRecipeRepository.findRecipeById(id);
         if (recipeEntity.isPresent()) {
-            userEntity.getFavourites().remove(recipeEntity.get());
-            jpaUserRepository.save(userEntity);
+            if (userEntity.getFavourites().contains(recipeEntity.get())) {
+                userEntity.getFavourites().remove(recipeEntity.get());
+                jpaUserRepository.save(userEntity);
+            }else{
+                throw new IllegalStateException("You dont have this recipe in favourites");
+            }
         } else {
-            throw new IllegalStateException("You dont have this recipe in favourites");
+            throw new IllegalStateException("This recipe doesnt exists");
         }
     }
 

@@ -9,8 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
-import pl.sda.demo.configuration.SecurityDetailsService;
-import pl.sda.demo.configuration.WebSecurityConfiguration;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.external.product.JpaProductRepository;
@@ -42,6 +40,8 @@ class UserServiceIntegrationTest {
     private JpaRecipeRepository jpaRecipeRepository;
     @Autowired
     private DatabaseUserRepository databaseUserRepository;
+    @Autowired
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private ProductEntity productEntity1;
     private ProductEntity productEntity2;
@@ -97,7 +97,7 @@ class UserServiceIntegrationTest {
         UserEntity result = jpaUserRepository.getOne(2);
         assertEquals(2, result.getId());
         assertEquals("username", result.getUsername());
-//        assertEquals(passwordEncoder.encode("password"), result.getPassword());
+        assertTrue(passwordEncoder.matches("password", result.getPassword()));
         assertTrue(result.getFavourites().isEmpty());
         assertTrue(result.getProducts().isEmpty());
     }
@@ -112,7 +112,7 @@ class UserServiceIntegrationTest {
         UserEntity result = jpaUserRepository.getOne(1);
         assertEquals(1, result.getId());
         assertEquals("testUsername", result.getUsername());
-//        assertEquals("newPassword", result.getPassword());
+        assertTrue(passwordEncoder.matches("newPassword", result.getPassword()));
         assertEquals(1, result.getFavourites().size());
         assertTrue(result.getFavourites().contains(recipeEntity2));
         assertEquals(2, result.getProducts().size());
@@ -134,7 +134,7 @@ class UserServiceIntegrationTest {
     @Test
     void addProductToFridge() {
         //given
-        Optional<User> user = databaseUserRepository.findByUsername("testUsername"); // dodac findByUsername do UserService!
+        Optional<User> user = databaseUserRepository.findByUsername("testUsername");
         Product newProduct = new Product(3, "testProduct3");
         //when
         assertTrue(user.isPresent());
@@ -157,7 +157,7 @@ class UserServiceIntegrationTest {
     @Test
     void removeProductFromFridge() {
         //given
-        Optional<User> user = databaseUserRepository.findByUsername("testUsername"); // dodac findByUsername do UserService!
+        Optional<User> user = databaseUserRepository.findByUsername("testUsername");
         //when
         assertTrue(user.isPresent());
         userService.removeProductFromFridge(1, user.get());
@@ -177,7 +177,7 @@ class UserServiceIntegrationTest {
     @Test
     void addRecipeToFavourites() {
         //given
-        Optional<User> user = databaseUserRepository.findByUsername("testUsername"); // dodac findByUsername do UserService!
+        Optional<User> user = databaseUserRepository.findByUsername("testUsername");
         List<Integer> ids = new ArrayList<>();
         ids.add(1);
         ids.add(3);
@@ -202,7 +202,7 @@ class UserServiceIntegrationTest {
     @Test
     void deleteRecipeFromFavourites() {
         //given
-        Optional<User> user = databaseUserRepository.findByUsername("testUsername"); // dodac findByUsername do UserService!
+        Optional<User> user = databaseUserRepository.findByUsername("testUsername");
         //when
         assertTrue(user.isPresent());
         userService.deleteRecipeFromFavourites(2, user.get());

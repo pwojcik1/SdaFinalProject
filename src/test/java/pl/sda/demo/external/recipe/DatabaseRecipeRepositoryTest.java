@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
@@ -232,4 +233,71 @@ class DatabaseRecipeRepositoryTest {
         assertTrue(result.contains(recipe1));
         assertTrue(result.contains(recipe2));
     }
+
+    @Test
+    void testShouldReturnAllRecipes() {
+        //given
+        ProductEntity productEntity1 = ProductEntity.builder().id(1).name("chleb").build();
+        ProductEntity productEntity2 = ProductEntity.builder().id(2).name("maslo").build();
+        ProductEntity productEntity3 = ProductEntity.builder().id(3).name("mleko").build();
+
+
+        Set<ProductEntity> products1 = new HashSet<>();
+        products1.add(productEntity1);
+        products1.add(productEntity2);
+
+        Set<ProductEntity> products2 = new HashSet<>();
+        products2.add(productEntity3);
+
+        RecipeEntity recipeEntity1 = RecipeEntity.builder()
+                .id(1)
+                .name("Kanapka")
+                .description("Pyszna kanapka")
+                .products(products1)
+                .build();
+
+        RecipeEntity recipeEntity2 = RecipeEntity.builder()
+                .id(2)
+                .name("Inna Kanapka")
+                .description("Dobra kanapka")
+                .products(products2)
+                .build();
+
+        List<RecipeEntity> recipeEntities = new ArrayList<>();
+        recipeEntities.add(recipeEntity1);
+        recipeEntities.add(recipeEntity2);
+
+        List<Integer> firstRecipeProducts = new ArrayList<>();
+        firstRecipeProducts.add(1);
+        firstRecipeProducts.add(2);
+
+        List<Integer> secondRecipeProducts = new ArrayList<>();
+        secondRecipeProducts.add(3);
+
+        Recipe recipe1 = Recipe.builder()
+                .id(1)
+                .name("Kanapka")
+                .description("Pyszna kanapka")
+                .productId(firstRecipeProducts)
+                .build();
+
+        Recipe recipe2 = Recipe.builder()
+                .id(2)
+                .name("Inna Kanapka")
+                .description("Dobra kanapka")
+                .productId(secondRecipeProducts)
+                .build();
+
+        //when
+        Mockito.when(jpaRecipeRepository.findAll()).thenReturn(recipeEntities);
+        Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity1.getProducts())).thenReturn(firstRecipeProducts);
+        Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity2.getProducts())).thenReturn(secondRecipeProducts);
+        List<Recipe> result = databaseRecipeRepository.getAllRecipes();
+        //then
+        Mockito.verify(jpaRecipeRepository).findAll();
+        assertEquals(2, result.size());
+        assertTrue(result.contains(recipe1));
+        assertTrue(result.contains(recipe2));
+    }
+
 }

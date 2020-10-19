@@ -155,4 +155,42 @@ class RecipeServiceIntegrationTest {
         assertTrue(result.contains(recipe3));
         assertFalse(result.contains(recipe1));
     }
+    @Test
+    void testShouldReturnAllRecipes(){
+        //given
+        List<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
+        ids.add(3);
+        Recipe recipe = new Recipe(1,"testName", "testDescription", ids);
+        //when
+        List<Recipe> result = recipeService.getAllRecipes();
+        //then
+        assertTrue(result.contains(recipe));
+        assertEquals(1,result.size());
+    }
+
+    @Test
+    void testShouldReturnOneRecipeById(){
+        //given
+        List<Integer> ids = new ArrayList<>();
+        ids.add(2);
+        //when
+        Recipe result = recipeService.getOne(1);
+        //then
+        assertEquals(1, result.getId());
+        assertEquals("testName", result.getName());
+        assertEquals("testDescription", result.getDescription());
+        assertEquals(ids, result.getProductId());
+    }
+
+    @Test
+    void testShouldThrowExceptionIfIdIsIncorrect(){
+        //given
+
+        //when
+        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> recipeService.getOne(4));
+        //then
+        assertEquals("Recipe with given id doesnt exist", ex.getMessage());
+    }
 }

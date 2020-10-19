@@ -68,10 +68,13 @@ public class UserService {
     }
 
     public List<Product> getAllProductsFromFridge(String username) {
-        return userRepository.getAllProductsFromFridge(username);
+        if(userRepository.findByUsername(username).isPresent()){
+            return userRepository.getAllProductsFromFridge(username);
+        }
+        throw new IllegalStateException("User doesnt exist");
     }
 
     public User findByUsername(String username){
-        return userRepository.findByUsername(username).orElseThrow(()-> new IllegalArgumentException("Wrong username"));
+        return userRepository.findByUsername(username).orElseThrow(()-> new IllegalStateException("Wrong username"));
     }
 }
