@@ -1,4 +1,4 @@
-package pl.sda.demo.mvc;
+package pl.sda.demo.mvc.user;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;

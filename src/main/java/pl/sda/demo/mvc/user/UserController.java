@@ -1,4 +1,4 @@
-package pl.sda.demo.mvc;
+package pl.sda.demo.mvc.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;

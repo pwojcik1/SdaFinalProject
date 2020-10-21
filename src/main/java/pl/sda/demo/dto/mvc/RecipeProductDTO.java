@@ -1,4 +1,4 @@
-package pl.sda.demo.dto;
+package pl.sda.demo.dto.mvc;
 
 import lombok.Getter;
 import lombok.Setter;

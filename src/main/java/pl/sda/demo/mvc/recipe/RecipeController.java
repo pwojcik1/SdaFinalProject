@@ -1,4 +1,4 @@
-package pl.sda.demo.mvc;
+package pl.sda.demo.mvc.recipe;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,10 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import pl.sda.demo.domain.product.ProductService;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.domain.recipe.RecipeService;
-import pl.sda.demo.dto.MapService;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
+import pl.sda.demo.dto.mvc.MapService;
 
 @Controller
 @RequestMapping("/recipe")
@@ -44,12 +41,10 @@ public class RecipeController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    String addNewDoctor(@ModelAttribute Recipe recipe) {
+    String addNewRecipe(@ModelAttribute Recipe recipe) {
         recipeService.addRecipeToDb(recipe);
         return "redirect:/recipe";
     }
-
-
 
     @GetMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
@@ -57,6 +52,4 @@ public class RecipeController {
         recipeService.deleteRecipeFromDb(id);
         return "redirect:/recipe";
     }
-
-
 }

@@ -1,4 +1,4 @@
-package pl.sda.demo.mvc;
+package pl.sda.demo.mvc.recipe;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pl.sda.demo.domain.recipe.RecipeService;
 import pl.sda.demo.domain.user.UserService;
-import pl.sda.demo.dto.MapService;
+import pl.sda.demo.dto.mvc.MapService;
 
 @Controller
 @RequestMapping("/search")
@@ -25,7 +25,7 @@ public class SearchController {
 
     @RequestMapping(method = {RequestMethod.POST, RequestMethod.GET})
     @PreAuthorize("isAuthenticated()")
-    ModelAndView favouritesPage() {
+    ModelAndView searchPage() {
         ModelAndView mav = new ModelAndView("search.html");
         User principal = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String username = principal.getUsername();
@@ -35,7 +35,7 @@ public class SearchController {
 
     @GetMapping("/add")
     @PreAuthorize("isAuthenticated()")
-    String addNewDoctor(@RequestParam Integer id) {
+    String addToFavourites(@RequestParam Integer id) {
         User principal = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String username = principal.getUsername();
         userService.addRecipeToFavourites(recipeService.getOne(id), userService.findByUsername(username));

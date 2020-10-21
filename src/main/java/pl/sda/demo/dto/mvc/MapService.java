@@ -1,7 +1,6 @@
-package pl.sda.demo.dto;
+package pl.sda.demo.dto.mvc;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;

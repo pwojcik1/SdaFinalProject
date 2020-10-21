@@ -1,4 +1,4 @@
-package pl.sda.demo.mvc;
+package pl.sda.demo.mvc.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -7,9 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
-
-import javax.validation.Valid;
-
 
 @Controller
 @RequestMapping("/product")
@@ -26,7 +23,6 @@ public class ProductController {
         return mav;
     }
 
-
     @GetMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     String deleteProduct(@RequestParam Integer id) {
@@ -36,7 +32,7 @@ public class ProductController {
 
     @GetMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    ModelAndView addDoctorPage() {
+    ModelAndView addProductPage() {
         ModelAndView mav = new ModelAndView("addProduct.html");
         mav.addObject("product", new Product());
         return mav;
@@ -44,14 +40,14 @@ public class ProductController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    String addNewDoctor(@ModelAttribute Product product) {
+    String addNewProduct(@ModelAttribute Product product) {
         productService.addProductToLibrary(product);
         return "redirect:/product";
     }
 
     @GetMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
-    ModelAndView addProduct(@RequestParam(name = "id") Integer id) {
+    ModelAndView updateProductPage(@RequestParam(name = "id") Integer id) {
         ModelAndView mav = new ModelAndView("updateProduct.html");
         mav.addObject("product", productService.getOne(id));
         return mav;
@@ -59,7 +55,7 @@ public class ProductController {
 
     @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
-    String addOrUpdateProduct(@ModelAttribute Product product) {
+    String updateProduct(@ModelAttribute Product product) {
         productService.updateProductInLibrary(product);
         return "redirect:/product";
     }

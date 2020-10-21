@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.sda.demo.domain.product.Product;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,9 @@ public class RecipeService {
     }
 
     public Set<Recipe> findByProducts(List<Product> products) {
+        if(products.isEmpty()){
+            return new HashSet<>();
+        }
         return recipeRepository.findByProducts(products);
     }
 
