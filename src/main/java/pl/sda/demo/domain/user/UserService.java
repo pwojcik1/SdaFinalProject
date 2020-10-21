@@ -77,4 +77,8 @@ public class UserService {
     public User findByUsername(String username){
         return userRepository.findByUsername(username).orElseThrow(()-> new IllegalStateException("Wrong username"));
     }
+
+    public List<Recipe> getAllFavourites(String username){
+        return userRepository.getAllFavourites(username);
+    }
 }

@@ -120,7 +120,7 @@ class RecipeServiceTest {
     void testShouldReturnOneRecipe(){
         //given
         //when
-        Mockito.when(recipeRepository.findByRecipeId(1)).thenReturn(Optional.of(new Recipe(1,"recipe1", "descrition", new ArrayList<>())));
+        Mockito.when(recipeRepository.findByRecipeId(1)).thenReturn(Optional.of(new Recipe(1,"recipe1", "description", new ArrayList<>())));
         Recipe result = recipeService.getOne(1);
         //then
         Mockito.verify(recipeRepository).findByRecipeId(1);

@@ -10,7 +10,7 @@
     Nazwa: <input type="text" th:field="*{name}"/><br>
     Opis: <input type="text" th:field="*{description}"/><br>
 
-    Produkt: <select th:field="*{productId}" multiple="multiple">
+    Produkt: <select th:field="*{productId}" multiple>
     <option
             th:each="product : ${products}"
             th:value="${product.id}"

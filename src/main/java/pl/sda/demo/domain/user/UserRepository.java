@@ -26,4 +26,6 @@ public interface UserRepository {
     List<Product> getAllProductsFromFridge(String username);
 
     Optional<Product> getProductFromFridgeByName(String name, User user);
+
+    List<Recipe> getAllFavourites(String username);
 }

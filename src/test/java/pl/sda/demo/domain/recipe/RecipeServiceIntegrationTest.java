@@ -174,7 +174,9 @@ class RecipeServiceIntegrationTest {
     void testShouldReturnOneRecipeById(){
         //given
         List<Integer> ids = new ArrayList<>();
+        ids.add(1);
         ids.add(2);
+        ids.add(3);
         //when
         Recipe result = recipeService.getOne(1);
         //then

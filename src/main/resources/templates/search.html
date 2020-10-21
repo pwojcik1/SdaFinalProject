@@ -12,9 +12,11 @@
     <td>Opis</td>
     <td>Produkty</td>
     <td>Add to favourites</td>
+
+
     </thead>
     <tbody>
-    <tr th:each="recipe, iterStat : ${recipes}" th:class="${iterStat.odd} ? 'odd' : 'even'">
+    <tr th:each="recipe, iterStat : ${search}" th:class="${iterStat.odd} ? 'odd' : 'even'">
         <td><span th:text="${recipe.recipeName}"></span></td>
         <td><span th:text="${recipe.recipeDescription}"></span></td>
         <td>
@@ -27,17 +29,10 @@
             </table>
         </td>
         <td>
-            <a th:href="@{/favourites/add?id=} + ${recipe.recipeId}">Add to favourites</a>
+            <a th:href="@{/search/add?id=} + ${recipe.recipeId}">Add to favourites</a>
         </td>
-        <div sec:authorize="hasRole('ADMIN')">
-            <td><a th:href="@{/recipe/update?id=} + ${recipe.recipeId}">Edytuj</a></td>
-            <td><a th:href="@{/recipe/delete?id=} + ${recipe.recipeId}">Usuń</a></td>
-        </div>
     </tr>
     </tbody>
 </table>
-<div sec:authorize="hasRole('ADMIN')">
-    <p><a th:href="@{/recipe/add}">Dodaj przepis</a></p>
-</div>
 </body>
 </html>

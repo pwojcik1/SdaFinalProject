@@ -98,7 +98,7 @@ public class DatabaseUserRepository implements UserRepository {
             if (userEntity.getFavourites().contains(recipeEntity.get())) {
                 userEntity.getFavourites().remove(recipeEntity.get());
                 jpaUserRepository.save(userEntity);
-            }else{
+            } else {
                 throw new IllegalStateException("You dont have this recipe in favourites");
             }
         } else {
@@ -133,6 +133,19 @@ public class DatabaseUserRepository implements UserRepository {
             throw new IllegalStateException("You dont have this product in fridge");
         }
         throw new IllegalStateException("Product with given name doesnt exist");
+    }
+
+    @Override
+    public List<Recipe> getAllFavourites(String username) {
+        return jpaRecipeRepository.findAllFavourites(username)
+                .stream()
+                .map(recipeEntity -> Recipe.builder()
+                        .id(recipeEntity.getId())
+                        .name(recipeEntity.getName())
+                        .description(recipeEntity.getDescription())
+                        .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -31,4 +31,7 @@ public interface JpaRecipeRepository extends JpaRepository<RecipeEntity, Integer
             "     select p from RecipeEntity r1 inner join r1.products p " +
             "         where p not in (:products) and r.id = r1.id)")
     Set<RecipeEntity> findAllRecipesByProducts(@Param("products") Set<ProductEntity> products);
+
+    @Query("select u.favourites from UserEntity u where u.username =:username")
+    List<RecipeEntity> findAllFavourites(@Param("username") String username);
 }
