@@ -2,6 +2,7 @@ package pl.sda.demo.web.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
@@ -36,7 +37,8 @@ public class UserEndpoint {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<Product> getAllFromFridge(@RequestParam String username){
-        return userService.getAllProductsFromFridge(username);
+    List<Product> getAllFromFridge(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.getAllProductsFromFridge(principal.toString());
     }
 }

@@ -1,7 +1,6 @@
 package pl.sda.demo.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,27 +8,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import pl.sda.demo.domain.user.UserRepository;
+import pl.sda.demo.dto.api.LoginRq;
+import pl.sda.demo.dto.api.ApiMapService;
 
 import java.util.Collections;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SecurityDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final ApiMapService apiMapService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(usr -> new User(usr.getUsername(),
-                        usr.getPassword(), mapRole(usr.getRole())))
-                .orElseThrow(() -> new UsernameNotFoundException("User not exists"));
-    }
-    private List<GrantedAuthority> mapRole(String role) {
-        //dodajemy prefix ROLE_ - jesli sprawdzamy czy uzytkownik ma role to bez prefixu
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
-        return Collections.singletonList(authority);
+        LoginRq loginRq = apiMapService.convertUserToLoginRq(username);
+        return new User(loginRq.getUsername(), loginRq.getPassword(), Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + loginRq.getRole())));
     }
 }
