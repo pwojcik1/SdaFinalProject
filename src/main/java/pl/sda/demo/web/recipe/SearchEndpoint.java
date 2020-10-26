@@ -2,7 +2,11 @@ package pl.sda.demo.web.recipe;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
 import pl.sda.demo.domain.recipe.Recipe;
@@ -24,8 +28,9 @@ public class SearchEndpoint {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Set<Recipe> searchByProducts(@RequestParam String username) {
-        User user = userService.findByUsername(username);
+    Set<Recipe> searchByProducts() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
         List<Product> allProductsByIds = productService.findAllProductsByIds(user.getProductId());
         return recipeService.findByProducts(allProductsByIds);
     }

@@ -1,7 +1,6 @@
 package pl.sda.demo.domain.user;
 
 import lombok.*;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;

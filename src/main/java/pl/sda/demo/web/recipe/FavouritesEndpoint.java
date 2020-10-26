@@ -2,12 +2,12 @@ package pl.sda.demo.web.recipe;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.domain.recipe.RecipeService;
 import pl.sda.demo.domain.user.User;
 import pl.sda.demo.domain.user.UserService;
-import pl.sda.demo.dto.api.RecipeUserDTO;
 
 @RestController
 @RequestMapping("api/favourites")
@@ -19,16 +19,18 @@ public class FavouritesEndpoint {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    void addToFavourites(@RequestBody RecipeUserDTO recipeUserDTO){
-        Recipe recipe = recipeService.getOne(recipeUserDTO.getRecipeId());
-        User user = userService.findByUsername(recipeUserDTO.getUsername());
+    void addToFavourites(@RequestParam Integer id){
+        Recipe recipe = recipeService.getOne(id);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
         userService.addRecipeToFavourites(recipe, user);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removeFromFavourites(@RequestBody RecipeUserDTO recipeUserDTO){
-        User user = userService.findByUsername(recipeUserDTO.getUsername());
-        userService.deleteRecipeFromFavourites(recipeUserDTO.getRecipeId(),user);
+    void removeFromFavourites(@RequestParam Integer id){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
+        userService.deleteRecipeFromFavourites(id,user);
     }
 }

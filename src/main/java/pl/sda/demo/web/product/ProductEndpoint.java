@@ -2,10 +2,14 @@ package pl.sda.demo.web.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -17,18 +21,28 @@ public class ProductEndpoint {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+//    @PreAuthorize("hasRole('ADMIN')")
     void createProduct(@RequestBody Product product){
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        for(GrantedAuthority authority: authorities){
+            System.out.println(authority.toString());
+        }
+        if(authorities.isEmpty()){
+            System.out.println("chuj kurwa");
+        }
         productService.addProductToLibrary(product);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     void deleteProduct(@RequestParam Integer id){
         productService.deleteProductFromLibrary(id);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     void updateProduct(@RequestBody Product product){
         productService.updateProductInLibrary(product);
     }

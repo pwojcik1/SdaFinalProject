@@ -8,7 +8,6 @@ import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
 import pl.sda.demo.domain.user.User;
 import pl.sda.demo.domain.user.UserService;
-import pl.sda.demo.dto.api.ProductUserDTO;
 
 import java.util.List;
 
@@ -22,22 +21,24 @@ public class UserEndpoint {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    void addToFridge(@RequestBody ProductUserDTO productUserDTO){
-        User user = userService.findByUsername(productUserDTO.getUsername());
-        Product product = productService.getOne(productUserDTO.getProductId());
-        userService.addProductToFridge(product,user);
+    void addToFridge(@RequestParam Integer id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
+        Product product = productService.getOne(id);
+        userService.addProductToFridge(product, user);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removeFromFridge(@RequestBody ProductUserDTO productUserDTO){
-        User user = userService.findByUsername(productUserDTO.getUsername());
-        userService.removeProductFromFridge(productUserDTO.getProductId(),user);
+    void removeFromFridge(@RequestParam Integer id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
+        userService.removeProductFromFridge(id, user);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<Product> getAllFromFridge(){
+    List<Product> getAllFromFridge() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userService.getAllProductsFromFridge(principal.toString());
     }

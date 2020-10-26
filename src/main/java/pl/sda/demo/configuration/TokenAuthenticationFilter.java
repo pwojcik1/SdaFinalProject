@@ -1,9 +1,8 @@
 package pl.sda.demo.configuration;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import com.auth0.jwt.JWT;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +22,6 @@ import java.util.Date;
 import static pl.sda.demo.configuration.SecurityConstants.*;
 
 
-
 public class TokenAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
@@ -32,6 +30,7 @@ public class TokenAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
         setFilterProcessesUrl("/api/login");
     }
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {

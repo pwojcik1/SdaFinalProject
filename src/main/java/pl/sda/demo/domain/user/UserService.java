@@ -7,7 +7,6 @@ import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
