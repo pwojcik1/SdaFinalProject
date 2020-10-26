@@ -21,39 +21,32 @@ public class ProductEndpoint {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-//    @PreAuthorize("hasRole('ADMIN')")
-    void createProduct(@RequestBody Product product){
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        for(GrantedAuthority authority: authorities){
-            System.out.println(authority.toString());
-        }
-        if(authorities.isEmpty()){
-            System.out.println("chuj kurwa");
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    void createProduct(@RequestBody Product product) {
         productService.addProductToLibrary(product);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
-    void deleteProduct(@RequestParam Integer id){
+    void deleteProduct(@RequestParam Integer id) {
         productService.deleteProductFromLibrary(id);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    void updateProduct(@RequestBody Product product){
+    void updateProduct(@RequestBody Product product) {
         productService.updateProductInLibrary(product);
     }
 
     @GetMapping
-    List<Product> getAllProducts(){
+    List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    Product getById(@PathVariable Integer id){
+    Product getById(@PathVariable Integer id) {
         return productService.getOne(id);
     }
 }
