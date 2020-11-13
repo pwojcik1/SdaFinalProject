@@ -3,13 +3,10 @@ package pl.sda.demo.web.product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.product.ProductService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -41,15 +38,14 @@ public class ProductEndpoint {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     Product getById(@PathVariable Integer id) {
         return productService.getOne(id);
     }
 }
-
-
-

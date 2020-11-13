@@ -19,7 +19,7 @@ public class ProductService {
     }
 
     public void updateProductInLibrary(Product product) {
-        productRepository.getProductByName(product.getName())
+        productRepository.getOne(product.getId())
                 .filter(p -> !p.getId().equals(product.getId()))
                 .ifPresent(product1 -> {
                     throw new IllegalStateException("Cannot update product with different id");

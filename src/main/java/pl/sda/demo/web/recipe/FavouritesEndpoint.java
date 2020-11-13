@@ -21,16 +21,16 @@ public class FavouritesEndpoint {
     @ResponseStatus(HttpStatus.OK)
     void addToFavourites(@RequestParam Integer id){
         Recipe recipe = recipeService.getOne(id);
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.toString());
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User )SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.getUsername());
         userService.addRecipeToFavourites(recipe, user);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void removeFromFavourites(@RequestParam Integer id){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.toString());
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User )SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.getUsername());
         userService.deleteRecipeFromFavourites(id,user);
     }
 }

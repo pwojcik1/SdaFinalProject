@@ -38,11 +38,13 @@ public class RecipeEndpoint {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     List<Recipe> getAllRecipes(){
         return recipeService.getAllRecipes();
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     Recipe getById(@PathVariable Integer id){
         return recipeService.getOne(id);
     }

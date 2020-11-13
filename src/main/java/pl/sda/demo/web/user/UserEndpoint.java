@@ -22,8 +22,9 @@ public class UserEndpoint {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     void addToFridge(@RequestParam Integer id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.toString());
+        org.springframework.security.core.userdetails.User principal =
+                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.getUsername());
         Product product = productService.getOne(id);
         userService.addProductToFridge(product, user);
     }
@@ -31,15 +32,17 @@ public class UserEndpoint {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void removeFromFridge(@RequestParam Integer id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.toString());
+        org.springframework.security.core.userdetails.User principal =
+                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.getUsername());
         userService.removeProductFromFridge(id, user);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<Product> getAllFromFridge() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userService.getAllProductsFromFridge(principal.toString());
+        org.springframework.security.core.userdetails.User principal =
+                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userService.getAllProductsFromFridge(principal.getUsername());
     }
 }

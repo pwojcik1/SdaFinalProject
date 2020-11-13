@@ -60,6 +60,7 @@ class UserServiceTest {
         //then
         Mockito.verify(userRepository).findByUsername("username");
         assertEquals("username", result.getUsername());
+        assertEquals("user", result.getRole());
         assertTrue(passwordEncoder.matches("password", result.getPassword()));
     }
 

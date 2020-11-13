@@ -44,13 +44,13 @@ public class ProductServiceTest {
         //given
         Product product = new Product(1, "Eggs");
         //when
-        Mockito.when(productRepository.getProductByName(product.getName())).thenReturn(Optional.of(new Product(1, "Egg")));
+        Mockito.when(productRepository.getOne(product.getId())).thenReturn(Optional.of(new Product(1, "Egg")));
         productService.updateProductInLibrary(product);
 
         Mockito.verify(productRepository).updateProductInLibrary(argumentCaptor.capture());
         Product result = argumentCaptor.getValue();
         //then
-        Mockito.verify(productRepository).getProductByName("Eggs");
+        Mockito.verify(productRepository).getOne(1);
         assertEquals(1, result.getId());
         assertEquals("Eggs", result.getName());
     }
@@ -60,10 +60,10 @@ public class ProductServiceTest {
         //given
         Product product = new Product(1, "Eggs");
         //when
-        Mockito.when(productRepository.getProductByName(product.getName())).thenReturn(Optional.of(new Product(2, "Egg")));
+        Mockito.when(productRepository.getOne(product.getId())).thenReturn(Optional.of(new Product(2, "Egg")));
         IllegalStateException ex = assertThrows(IllegalStateException.class, () ->productService.updateProductInLibrary(product));
         //then
-        Mockito.verify(productRepository).getProductByName("Eggs");
+        Mockito.verify(productRepository).getOne(1);
         assertEquals("Cannot update product with different id", ex.getMessage());
         Mockito.verify(productRepository, Mockito.never()).updateProductInLibrary(product);
     }

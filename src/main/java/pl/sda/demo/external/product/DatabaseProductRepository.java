@@ -47,12 +47,15 @@ public class DatabaseProductRepository implements ProductRepository {
 
     @Override
     public List<Product> getAllProducts() {
-        return jpaProductRepository.findAll().stream().map(ent -> new Product(ent.getId(), ent.getName())).collect(Collectors.toList());
+        return jpaProductRepository.findAll()
+                .stream()
+                .map(ent -> new Product(ent.getId(), ent.getName())).collect(Collectors.toList());
     }
 
     @Override
     public Optional<Product> getOne(int id) {
-        return jpaProductRepository.findById(id).map(ent-> new Product(ent.getId(), ent.getName()));
+        return jpaProductRepository.findById(id)
+                .map(ent -> new Product(ent.getId(), ent.getName()));
     }
 
     @Override
