@@ -15,7 +15,6 @@ public class RegisterEndpoint {
     private final UserService userService;
     private final ApiMapService apiMapService;
 
-
     @PostMapping
     @RequestMapping("/api/register")
     @ResponseStatus(HttpStatus.CREATED)

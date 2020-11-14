@@ -45,7 +45,6 @@ class FavouritesEndpointITTest {
 
     @Test
     @WithMockUser(username = "username")
-    @Transactional
     void testShouldAddRecipeToFavourites() throws Exception {
         UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), new HashSet<>());
         jpaUserRepository.save(userEntity);
@@ -87,6 +86,31 @@ class FavouritesEndpointITTest {
 
         List<RecipeEntity> result = jpaRecipeRepository.findAllFavourites("username");
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "username")
+    void testShouldReturnAllFavourites() throws Exception{
+        ProductEntity productEntity = new ProductEntity(1, "product");
+        jpaProductRepository.save(productEntity);
+        Set<ProductEntity> productEntities = new HashSet<>();
+        productEntities.add(productEntity);
+        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities);
+        jpaRecipeRepository.save(recipeEntity);
+        Set<RecipeEntity> favourites = new HashSet<>();
+        favourites.add(recipeEntity);
+        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", favourites, new HashSet<>());
+        jpaUserRepository.save(userEntity);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/favourites")
+        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].description").value("desc"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId.size()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[0]").value(1));
     }
 
 }

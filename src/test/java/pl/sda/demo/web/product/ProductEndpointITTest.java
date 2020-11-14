@@ -35,7 +35,6 @@ class ProductEndpointITTest {
 
     @Test
     @WithMockUser(roles = {"ADMIN"})
-    @Transactional
     void testShouldCreateProduct() throws Exception {
         ProductEntity productEntity = new ProductEntity(null, "testProduct");
         jpaProductRepository.save(productEntity);

@@ -75,11 +75,10 @@ class UserEndpointITTest {
 
     @Test
     @WithMockUser(username = "username")
-    void testShouldReturnAllProductsFromFridge(){
-
+    void testShouldReturnAllProductsFromFridge() throws Exception {
         ProductEntity productEntity = new ProductEntity(1, "product");
         jpaProductRepository.save(productEntity);
-        ProductEntity productEntity2 = new ProductEntity(2, "produc2");
+        ProductEntity productEntity2 = new ProductEntity(2, "product2");
         jpaProductRepository.save(productEntity2);
         Set<ProductEntity> products = new HashSet<>();
         products.add(productEntity);
@@ -87,6 +86,13 @@ class UserEndpointITTest {
         UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), products);
         jpaUserRepository.save(userEntity);
 
-
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("product"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].id").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("product2"));
     }
 }

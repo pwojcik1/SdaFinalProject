@@ -2,57 +2,54 @@ package pl.sda.demo.web.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import pl.sda.demo.dto.api.LoginRq;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.sda.demo.external.user.JpaUserRepository;
 import pl.sda.demo.external.user.UserEntity;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class RegisterEndpointTest {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private MockMvc mockMvc;
+
     @Autowired
     private JpaUserRepository jpaUserRepository;
+
     @Autowired
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Test
-    @Transactional
-    void testShouldRegisterUser() {
-        //given
-        LoginRq loginRq = new LoginRq("username", "password", "ADMIN");
+    void testShouldRegisterUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "    \"username\": \"username\",\n" +
+                        "    \"password\": \"password\",\n" +
+                        "    \"role\": \"ADMIN\"\n" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(201));
 
-        HttpHeaders headers = new HttpHeaders();
+        UserEntity user = jpaUserRepository.getOne(1);
 
-        HttpEntity<LoginRq> entity = new HttpEntity<>(loginRq, headers);
-        //when
-
-        ResponseEntity<Void> response = testRestTemplate.exchange("/api/register", HttpMethod.POST, entity, Void.class);
-        //then
-        assertEquals(201, response.getStatusCodeValue());
-        List<UserEntity> all = jpaUserRepository.findAll();
-        assertEquals(1, all.size());
-        UserEntity userEntity = all.get(0);
-        assertEquals(1, userEntity.getId());
-        assertEquals("username", userEntity.getUsername());
-        assertEquals("ADMIN", userEntity.getRole());
-        assertTrue(passwordEncoder.matches("password", userEntity.getPassword()));
-        assertTrue(userEntity.getFavourites().isEmpty());
-        assertTrue(userEntity.getProducts().isEmpty());
+        assertEquals(1, user.getId());
+        assertEquals("username", user.getUsername());
+        assertEquals("ADMIN", user.getRole());
+        assertTrue(passwordEncoder.matches("password", user.getPassword()));
     }
 }
