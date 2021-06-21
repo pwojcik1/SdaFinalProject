@@ -1,6 +1,9 @@
 package pl.sda.demo.external.recipe;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.external.product.ProductEntity;
 
@@ -10,11 +13,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
 @Entity
-@ToString
-@Setter
-@EqualsAndHashCode
+@Data
 @Table(name = "recipes")
 public class RecipeEntity {
     @Id

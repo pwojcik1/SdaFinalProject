@@ -30,7 +30,7 @@ class DatabaseUserRepositoryTest {
         Mockito.when(jpaRecipeRepository.findAllRecipesByIdInCollection(user.getRecipeId())).thenReturn(new HashSet<>());
         Mockito.when(jpaProductRepository.findAllProductsByIdInList(user.getProductId())).thenReturn(new HashSet<>());
 
-        databaseUserRepository.createUser(user);
+        databaseUserRepository.addUser(user);
 
         Mockito.verify(jpaRecipeRepository).findAllRecipesByIdInCollection(user.getRecipeId());
         Mockito.verify(jpaProductRepository).findAllProductsByIdInList(user.getProductId());
@@ -110,12 +110,12 @@ class DatabaseUserRepositoryTest {
         UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), products);
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
-        Mockito.when(jpaProductRepository.findProductById(3)).thenReturn(Optional.of(productEntity));
+        Mockito.when(jpaProductRepository.findById(3)).thenReturn(Optional.of(productEntity));
 
         databaseUserRepository.removeProductFromFridge(3, user);
 
         Mockito.verify(jpaUserRepository).findById(user.getId());
-        Mockito.verify(jpaProductRepository).findProductById(3);
+        Mockito.verify(jpaProductRepository).findById(3);
         Mockito.verify(jpaUserRepository).save(argumentCaptor.capture());
 
         UserEntity result = argumentCaptor.getValue();
@@ -135,7 +135,7 @@ class DatabaseUserRepositoryTest {
         UserEntity userEntity = new UserEntity(2, "user", "password","user", new HashSet<>(), new HashSet<>());
         //when
         Mockito.when(jpaUserRepository.findById(user.getId())).thenReturn(Optional.of(userEntity));
-        Mockito.when(jpaProductRepository.findProductById(3)).thenReturn(Optional.empty());
+        Mockito.when(jpaProductRepository.findById(3)).thenReturn(Optional.empty());
 
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> databaseUserRepository.removeProductFromFridge(3, user));
         //then

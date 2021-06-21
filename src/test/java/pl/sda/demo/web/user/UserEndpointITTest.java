@@ -11,14 +11,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.sda.demo.external.product.JpaProductRepository;
-import pl.sda.demo.external.product.ProductEntity;
 import pl.sda.demo.external.user.JpaUserRepository;
 import pl.sda.demo.external.user.UserEntity;
 
 import javax.transaction.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,62 +33,46 @@ class UserEndpointITTest {
     private JpaProductRepository jpaProductRepository;
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     void testShouldAddProductToFridge() throws Exception {
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), new HashSet<>());
-        jpaUserRepository.save(userEntity);
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/user")
-                .param("id", "1")
+                .param("id", "5")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
-        UserEntity user = jpaUserRepository.getOne(1);
-        assertEquals(1, user.getProducts().size());
-        assertTrue(user.getProducts().contains(productEntity));
+        UserEntity user = jpaUserRepository.getOne(2);
+        assertEquals(3, user.getProducts().size());
+        assertTrue(user.getProducts().contains(jpaProductRepository.getOne(1)));
+        assertTrue(user.getProducts().contains(jpaProductRepository.getOne(2)));
+        assertTrue(user.getProducts().contains(jpaProductRepository.getOne(5)));
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     void testShouldRemoveProductFromFridge() throws Exception {
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
-        Set<ProductEntity> products = new HashSet<>();
-        products.add(productEntity);
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), products);
-        jpaUserRepository.save(userEntity);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/user")
                 .param("id", "1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(204));
 
-        UserEntity user = jpaUserRepository.getOne(1);
-        assertTrue(user.getProducts().isEmpty());
+        UserEntity user = jpaUserRepository.getOne(2);
+        assertEquals(1, user.getProducts().size());
+        assertTrue(user.getProducts().contains(jpaProductRepository.getOne(2)));
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     void testShouldReturnAllProductsFromFridge() throws Exception {
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
-        ProductEntity productEntity2 = new ProductEntity(2, "product2");
-        jpaProductRepository.save(productEntity2);
-        Set<ProductEntity> products = new HashSet<>();
-        products.add(productEntity);
-        products.add(productEntity2);
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), products);
-        jpaUserRepository.save(userEntity);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/user")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("product"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("Product1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[1].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("product2"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("Product2"));
     }
 }

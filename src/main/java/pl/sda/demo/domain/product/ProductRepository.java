@@ -10,11 +10,11 @@ public interface ProductRepository {
 
     void deleteProductFromLibrary(int id);
 
-    Optional<Product> getProductByName(String name);
+    Optional<Product> findProductByName(String name);
 
-    List<Product> getAllProducts();
+    List<Product> findAllProducts();
 
-    Optional<Product> getOne(int id);
+    Optional<Product> findProductById(int id);
 
-    List<Product> getAllProductsByIds(List<Integer> ids);
+    List<Product> findListOfProductsByIds(List<Integer> ids);
 }

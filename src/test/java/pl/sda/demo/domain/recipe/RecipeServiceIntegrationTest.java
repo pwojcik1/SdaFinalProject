@@ -1,6 +1,5 @@
 package pl.sda.demo.domain.recipe;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -8,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import pl.sda.demo.domain.product.Product;
+import pl.sda.demo.domain.product.ProductService;
 import pl.sda.demo.external.product.JpaProductRepository;
-import pl.sda.demo.external.product.ProductEntity;
 import pl.sda.demo.external.recipe.JpaRecipeRepository;
 import pl.sda.demo.external.recipe.RecipeEntity;
 
@@ -31,29 +30,9 @@ class RecipeServiceIntegrationTest {
 
     @Autowired
     private RecipeService recipeService;
-    ProductEntity productEntity1;
-    ProductEntity productEntity2;
-    ProductEntity productEntity3;
-    RecipeEntity recipeEntity;
 
-    @BeforeEach
-    void setup() {
-        productEntity1 = new ProductEntity(1, "product1");
-        productEntity2 = new ProductEntity(2, "product2");
-        productEntity3 = new ProductEntity(3, "product3");
-
-        jpaProductRepository.save(productEntity1);
-        jpaProductRepository.save(productEntity2);
-        jpaProductRepository.save(productEntity3);
-
-        Set<ProductEntity> products = new HashSet<>();
-        products.add(productEntity1);
-        products.add(productEntity2);
-        products.add(productEntity3);
-
-        recipeEntity = new RecipeEntity(1, "testName", "testDescription", products);
-        jpaRecipeRepository.save(recipeEntity);
-    }
+    @Autowired
+    private ProductService productService;
 
     @Test
     void testShouldAddRecipeToDb() {
@@ -65,21 +44,21 @@ class RecipeServiceIntegrationTest {
         //when
         recipeService.addRecipeToDb(recipe);
         //then
-        RecipeEntity result = jpaRecipeRepository.getOne(2);
-        assertEquals(2, result.getId());
+        RecipeEntity result = jpaRecipeRepository.getOne(5);
+        assertEquals(5, result.getId());
         assertEquals("name", result.getName());
         assertEquals("description", result.getDescription());
         assertEquals(2, result.getProducts().size());
-        assertTrue(result.getProducts().contains(productEntity1));
-        assertTrue(result.getProducts().contains(productEntity2));
+        assertTrue(result.getProducts().contains(jpaProductRepository.getOne(1)));
+        assertTrue(result.getProducts().contains(jpaProductRepository.getOne(2)));
     }
 
     @Test
-    void testShouldUpdateRecipe(){
+    void testShouldUpdateRecipe() {
         //given
         List<Integer> ids = new ArrayList<>();
         ids.add(2);
-        Recipe recipe = new Recipe(1,"newName", "newDescription", ids);
+        Recipe recipe = new Recipe(1, "newName", "newDescription", ids);
         //when
         recipeService.updateRecipeInDb(recipe);
         //then
@@ -88,110 +67,88 @@ class RecipeServiceIntegrationTest {
         assertEquals("newDescription", result.getDescription());
         assertEquals("newName", result.getName());
         assertEquals(1, result.getProducts().size());
-        assertTrue(result.getProducts().contains(productEntity2));
-        assertFalse(result.getProducts().contains(productEntity1));
-        assertFalse(result.getProducts().contains(productEntity3));
+        assertTrue(result.getProducts().contains(jpaProductRepository.getOne(2)));
+        assertFalse(result.getProducts().contains(jpaProductRepository.getOne(1)));
+        assertFalse(result.getProducts().contains(jpaProductRepository.getOne(4)));
+        assertFalse(result.getProducts().contains(jpaProductRepository.getOne(6)));
     }
 
     @Test
-    void testShouldDeleteRecipeFromDb(){
+    void testShouldDeleteRecipeFromDb() {
         //given
-
         //when
         recipeService.deleteRecipeFromDb(1);
         //then
-        Optional<RecipeEntity> result = jpaRecipeRepository.findRecipeById(1);
+        Optional<RecipeEntity> result = jpaRecipeRepository.findById(1);
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void testShouldFindRecipeByName(){
+    void testShouldFindRecipeByName() {
         //given
-
         //when
-        Recipe result = recipeService.findByRecipeName("testName");
+        Recipe result = recipeService.findRecipeByName("Recipe3");
         //then
-        assertEquals(1, result.getId());
-        assertEquals("testDescription", result.getDescription());
-        assertEquals("testName", result.getName());
-        assertEquals(3, result.getProductId().size());
-        assertTrue(result.getProductId().contains(1));
+        assertEquals(3, result.getId());
+        assertEquals("description for recipe3", result.getDescription());
+        assertEquals("Recipe3", result.getName());
+        assertEquals(2, result.getProductId().size());
         assertTrue(result.getProductId().contains(2));
-        assertTrue(result.getProductId().contains(3));
+        assertTrue(result.getProductId().contains(4));
     }
 
     @Test
-    void testShouldFindRecipesByProducts(){
+    void testShouldFindRecipesByProducts() {
         //given
-        Set<ProductEntity> products1 = new HashSet<>();
-        products1.add(productEntity1);
-
-        recipeEntity = new RecipeEntity(2, "testName2", "testDescription2", products1);
-        jpaRecipeRepository.save(recipeEntity);
-
-        Set<ProductEntity> products2 = new HashSet<>();
-        products2.add(productEntity1);
-        products2.add(productEntity2);
-
-        recipeEntity = new RecipeEntity(3, "testName3", "testDescription3", products2);
-        jpaRecipeRepository.save(recipeEntity);
-
-        Product product1 = new Product(1,"product1");
-        Product product2 = new Product(2,"product2");
-
         List<Product> given = new ArrayList<>();
-        given.add(product1);
-        given.add(product2);
-
-        Recipe recipe1 = recipeService.findByRecipeName("testName");
-        Recipe recipe2 = recipeService.findByRecipeName("testName2");
-        Recipe recipe3 = recipeService.findByRecipeName("testName3");
-
+        given.add(productService.findProductById(1));
+        given.add(productService.findProductById(2));
+        given.add(productService.findProductById(4));
+        given.add(productService.findProductById(6));
         //when
-        Set<Recipe> result = recipeService.findByProducts(given);
+        Set<Recipe> result = recipeService.findRecipeByProducts(given);
         //then
         assertEquals(2, result.size());
-        assertTrue(result.contains(recipe2));
-        assertTrue(result.contains(recipe3));
-        assertFalse(result.contains(recipe1));
-    }
-    @Test
-    void testShouldReturnAllRecipes(){
-        //given
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
-        ids.add(2);
-        ids.add(3);
-        Recipe recipe = new Recipe(1,"testName", "testDescription", ids);
-        //when
-        List<Recipe> result = recipeService.getAllRecipes();
-        //then
-        assertTrue(result.contains(recipe));
-        assertEquals(1,result.size());
+        assertTrue(result.contains(recipeService.findRecipeById(1)));
+        assertTrue(result.contains(recipeService.findRecipeById(3)));
+        assertFalse(result.contains(recipeService.findRecipeById(2)));
+        assertFalse(result.contains(recipeService.findRecipeById(4)));
     }
 
     @Test
-    void testShouldReturnOneRecipeById(){
+    void testShouldReturnAllRecipes() {
+        //given
+        //when
+        List<Recipe> result = recipeService.findAllRecipes();
+        //then
+        assertEquals(4, result.size());
+        assertTrue(result.contains(recipeService.findRecipeById(1)));
+        assertTrue(result.contains(recipeService.findRecipeById(2)));
+        assertTrue(result.contains(recipeService.findRecipeById(3)));
+        assertTrue(result.contains(recipeService.findRecipeById(4)));
+    }
+
+    @Test
+    void testShouldReturnOneRecipeById() {
         //given
         List<Integer> ids = new ArrayList<>();
         ids.add(1);
-        ids.add(2);
-        ids.add(3);
+        ids.add(4);
+        ids.add(6);
         //when
-        Recipe result = recipeService.getOne(1);
+        Recipe result = recipeService.findRecipeById(1);
         //then
         assertEquals(1, result.getId());
-        assertEquals("testName", result.getName());
-        assertEquals("testDescription", result.getDescription());
+        assertEquals("Recipe1", result.getName());
+        assertEquals("description for recipe1", result.getDescription());
         assertEquals(ids, result.getProductId());
     }
 
     @Test
-    void testShouldThrowExceptionIfIdIsIncorrect(){
+    void testShouldThrowExceptionIfIdIsIncorrect() {
         //given
-
         //when
-        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> recipeService.getOne(4));
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> recipeService.findRecipeById(100));
         //then
         assertEquals("Recipe with given id doesnt exist", ex.getMessage());
     }

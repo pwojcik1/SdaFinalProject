@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.sda.demo.dto.api.LoginRq;
+import pl.sda.demo.dto.LoginRq;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -54,8 +54,10 @@ public class TokenAuthenticationFilter extends UsernamePasswordAuthenticationFil
         String token = JWT.create()
                 .withSubject(((User) authResult.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .withClaim("role", ((User) authResult.getPrincipal()).getAuthorities().toString())
                 .sign(Algorithm.HMAC512(SECRET.getBytes()));
 
+        response.addHeader("Access-Control-Expose-Headers", "Authorization");
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
     }
 }

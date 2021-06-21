@@ -29,10 +29,9 @@ public class SearchEndpoint {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Set<Recipe> searchByProducts() {
-        org.springframework.security.core.userdetails.User principal =
-                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.getUsername());
-        List<Product> allProductsByIds = productService.findAllProductsByIds(user.getProductId());
-        return recipeService.findByProducts(allProductsByIds);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
+        List<Product> allProductsByIds = productService.findListOfProductsByIds(user.getProductId());
+        return recipeService.findRecipeByProducts(allProductsByIds);
     }
 }

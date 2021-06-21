@@ -11,7 +11,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public void addProductToLibrary(Product product) {
-        productRepository.getProductByName(product.getName())
+        productRepository.findProductByName(product.getName())
                 .ifPresent((p -> {
                     throw new IllegalStateException("Product with same name already exists");
                 }));
@@ -19,7 +19,7 @@ public class ProductService {
     }
 
     public void updateProductInLibrary(Product product) {
-        productRepository.getOne(product.getId())
+        productRepository.findProductById(product.getId())
                 .filter(p -> !p.getId().equals(product.getId()))
                 .ifPresent(product1 -> {
                     throw new IllegalStateException("Cannot update product with different id");
@@ -31,14 +31,15 @@ public class ProductService {
         productRepository.deleteProductFromLibrary(id);
     }
 
-    public List<Product> getAllProducts(){
-       return productRepository.getAllProducts();
+    public List<Product> findAllProducts() {
+        return productRepository.findAllProducts();
     }
 
-    public Product getOne(int id){
-        return productRepository.getOne(id).orElseThrow(() -> new IllegalStateException("Product with given id doesnt exist"));
+    public Product findProductById(int id) {
+        return productRepository.findProductById(id).orElseThrow(() -> new IllegalStateException("Product with given id doesnt exist"));
     }
-    public List<Product> findAllProductsByIds(List<Integer> ids){
-        return productRepository.getAllProductsByIds(ids);
+
+    public List<Product> findListOfProductsByIds(List<Integer> ids) {
+        return productRepository.findListOfProductsByIds(ids);
     }
 }

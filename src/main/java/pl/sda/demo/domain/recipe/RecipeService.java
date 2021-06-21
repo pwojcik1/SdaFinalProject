@@ -14,7 +14,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
 
     public void addRecipeToDb(Recipe recipe) {
-        recipeRepository.findByRecipeName(recipe.getName())
+        recipeRepository.findRecipeByName(recipe.getName())
                 .ifPresent(r -> {
                     throw new IllegalStateException("Recipe with same name already exists");
                 });
@@ -22,7 +22,7 @@ public class RecipeService {
     }
 
     public void updateRecipeInDb(Recipe recipe) {
-        recipeRepository.findByRecipeId(recipe.getId())
+        recipeRepository.findRecipeById(recipe.getId())
                 .filter(r -> !r.getId().equals(recipe.getId()))
                 .ifPresent(recipe1 -> {
                     throw new IllegalStateException("Cannot update product with different id");
@@ -34,23 +34,23 @@ public class RecipeService {
         recipeRepository.deleteRecipeFromDb(id);
     }
 
-    public Recipe findByRecipeName(String name) {
-        return recipeRepository.findByRecipeName(name).orElseThrow(() -> new IllegalStateException("recipe with given name doesnt exist"));
+    public Recipe findRecipeByName(String name) {
+        return recipeRepository.findRecipeByName(name).orElseThrow(() -> new IllegalStateException("recipe with given name doesnt exist"));
     }
 
-    public Set<Recipe> findByProducts(List<Product> products) {
-        if(products.isEmpty()){
+    public Set<Recipe> findRecipeByProducts(List<Product> products) {
+        if (products.isEmpty()) {
             return new HashSet<>();
         }
-        return recipeRepository.findByProducts(products);
+        return recipeRepository.findRecipeByProducts(products);
     }
 
-    public Recipe getOne(int id){
-        return recipeRepository.findByRecipeId(id).orElseThrow(() -> new IllegalStateException("Recipe with given id doesnt exist"));
+    public Recipe findRecipeById(int id) {
+        return recipeRepository.findRecipeById(id).orElseThrow(() -> new IllegalStateException("Recipe with given id doesnt exist"));
     }
 
-    public List<Recipe> getAllRecipes(){
-        return recipeRepository.getAllRecipes();
+    public List<Recipe> findAllRecipes() {
+        return recipeRepository.findAllRecipes();
     }
 }
 

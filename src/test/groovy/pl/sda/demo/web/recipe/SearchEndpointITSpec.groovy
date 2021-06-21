@@ -37,40 +37,14 @@ class SearchEndpointITSpec extends Specification {
     @Autowired
     private JpaRecipeRepository jpaRecipeRepository
 
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user1")
     def "test should return recipes by products"() {
-        given:
-        ProductEntity productEntity1 = new ProductEntity(1, "product1")
-        ProductEntity productEntity2 = new ProductEntity(2, "product2")
-        ProductEntity productEntity3 = new ProductEntity(3, "product3")
-
-        jpaProductRepository.save(productEntity1)
-        jpaProductRepository.save(productEntity2)
-        jpaProductRepository.save(productEntity3)
-
-        Set<ProductEntity> productEntities1 = new HashSet<>() << productEntity1
-
-        Set<ProductEntity> productEntities2 = new HashSet<>() << productEntity1 << productEntity2
-
-        Set<ProductEntity> productEntities3 = new HashSet<>() << productEntity3
-
-        RecipeEntity recipeEntity1 = new RecipeEntity(1, "recipe1", "desc1", productEntities1)
-        RecipeEntity recipeEntity2 = new RecipeEntity(2, "recipe2", "desc2", productEntities2)
-        RecipeEntity recipeEntity3 = new RecipeEntity(3, "recipe3", "desc3", productEntities3)
-
-        jpaRecipeRepository.save(recipeEntity1)
-        jpaRecipeRepository.save(recipeEntity2)
-        jpaRecipeRepository.save(recipeEntity3)
-
-        UserEntity userEntity = new UserEntity(1, "username", "pass", "USER", new HashSet<>(), productEntities2)
-        jpaUserRepository.save(userEntity)
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/search")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.size()').value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].name').value("recipe2"))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].name').value("recipe1"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.size()').value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].name').value("Recipe4"))
     }
 }
 

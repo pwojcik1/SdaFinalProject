@@ -8,11 +8,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
 @Entity
-@ToString
-@Setter
-@EqualsAndHashCode
+@Data
 @Table(name = "products")
 public class ProductEntity {
     @Id

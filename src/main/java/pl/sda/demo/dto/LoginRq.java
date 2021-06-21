@@ -1,4 +1,4 @@
-package pl.sda.demo.dto.api;
+package pl.sda.demo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -11,6 +11,7 @@ import pl.sda.demo.external.product.ProductEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,21 +23,29 @@ public class DatabaseRecipeRepository implements RecipeRepository {
 
     @Override
     public void addRecipeToDb(Recipe recipe) {
-        RecipeEntity recipeEntity = RecipeEntity.builder()
+        RecipeEntity recipeEntity = createRecipe(recipe);
+        jpaRecipeRepository.save(recipeEntity);
+    }
+
+    private RecipeEntity createRecipe(Recipe recipe) {
+        return RecipeEntity.builder()
                 .name(recipe.getName())
                 .description(recipe.getDescription())
-                .products(jpaProductRepository.findAllProductsByIdInList(recipe.getProductId()))
+                .products(getAllProductsByIdInList(recipe))
                 .build();
-        jpaRecipeRepository.save(recipeEntity);
     }
 
     @Override
     public void updateRecipeInDb(Recipe recipe) {
-        jpaRecipeRepository.findRecipeById(recipe.getId())
+        jpaRecipeRepository.findById(recipe.getId())
                 .ifPresent(recipeEntity -> {
-                    recipeEntity.updateFromDomain(recipe, jpaProductRepository.findAllProductsByIdInList(recipe.getProductId()));
+                    recipeEntity.updateFromDomain(recipe, getAllProductsByIdInList(recipe));
                     jpaRecipeRepository.save(recipeEntity);
                 });
+    }
+
+    private Set<ProductEntity> getAllProductsByIdInList(Recipe recipe) {
+        return jpaProductRepository.findAllProductsByIdInList(recipe.getProductId());
     }
 
     @Override
@@ -45,52 +54,55 @@ public class DatabaseRecipeRepository implements RecipeRepository {
     }
 
     @Override
-    public Optional<Recipe> findByRecipeName(String name) {
-        return jpaRecipeRepository.getRecipeByName(name)
-                .map(recipeEntity -> Recipe.builder()
-                        .id(recipeEntity.getId())
-                        .name(recipeEntity.getName())
-                        .description(recipeEntity.getDescription())
-                        .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
-                        .build());
+    public Optional<Recipe> findRecipeByName(String name) {
+        return jpaRecipeRepository.findRecipeByName(name)
+                .map(entityToRecipe());
     }
 
     @Override
-    public Optional<Recipe> findByRecipeId(int id) {
+    public Optional<Recipe> findRecipeById(int id) {
         return jpaRecipeRepository.findById(id)
-                .map(recipeEntity -> Recipe.builder()
-                .id(recipeEntity.getId())
-                .name(recipeEntity.getName())
-                .description(recipeEntity.getDescription())
-                .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
-                .build());
+                .map(entityToRecipe());
     }
 
     @Override
-    public Set<Recipe> findByProducts(List<Product> products) {
-        Set<ProductEntity> productEntities = products.stream().map(p -> ProductEntity.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .build()).collect(Collectors.toSet());
+    public Set<Recipe> findRecipeByProducts(List<Product> products) {
+        Set<ProductEntity> productEntities = products
+                .stream()
+                .map(productToEntity())
+                .collect(Collectors.toSet());
+
         Set<RecipeEntity> allRecipesByProducts = jpaRecipeRepository.findAllRecipesByProducts(productEntities);
+
         return allRecipesByProducts
                 .stream()
-                .map(ent -> Recipe.builder()
-                        .id(ent.getId())
-                        .name(ent.getName())
-                        .description(ent.getDescription())
-                        .productId(jpaProductRepository.findAllProductsIdFromCollection(ent.getProducts()))
-                        .build())
+                .map(entityToRecipe())
                 .collect(Collectors.toSet());
     }
 
+    private Function<Product, ProductEntity> productToEntity() {
+        return p -> ProductEntity.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .build();
+    }
+
     @Override
-    public List<Recipe> getAllRecipes() {
-        return jpaRecipeRepository.findAll().stream().map(recipeEntity -> Recipe.builder()
+    public List<Recipe> findAllRecipes() {
+        return jpaRecipeRepository.findAll()
+                .stream()
+                .map(entityToRecipe())
+                .collect(Collectors.toList());
+    }
+
+    private Function<RecipeEntity, Recipe> entityToRecipe() {
+        return recipeEntity -> Recipe.builder()
                 .id(recipeEntity.getId())
                 .name(recipeEntity.getName())
                 .description(recipeEntity.getDescription())
                 .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
-                .build() ).collect(Collectors.toList());
+                .build();
     }
+
+
 }

@@ -14,11 +14,11 @@ public interface RecipeRepository {
 
     void deleteRecipeFromDb(int id);
 
-    Optional<Recipe> findByRecipeName(String name);
+    Optional<Recipe> findRecipeByName(String name);
 
-    Optional<Recipe> findByRecipeId(int id);
+    Optional<Recipe> findRecipeById(int id);
 
-    Set<Recipe> findByProducts(List<Product> products);
+    Set<Recipe> findRecipeByProducts(List<Product> products);
 
-    List<Recipe> getAllRecipes();
+    List<Recipe> findAllRecipes();
 }

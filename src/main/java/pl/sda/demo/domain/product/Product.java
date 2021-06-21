@@ -5,10 +5,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
+@Data
 public class Product {
     private Integer id;
     private String name;

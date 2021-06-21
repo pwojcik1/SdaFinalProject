@@ -34,12 +34,12 @@ class DatabaseProductRepositoryTest {
         Product product = new Product(1,"Milk");
         ProductEntity productEntity = new ProductEntity(1,"Egg");
         //when
-        Mockito.when(jpaProductRepository.findProductById(product.getId())).thenReturn(Optional.of(productEntity));
+        Mockito.when(jpaProductRepository.findById(product.getId())).thenReturn(Optional.of(productEntity));
         databaseProductRepository.updateProductInLibrary(product);
         Mockito.verify(jpaProductRepository).save(argumentCaptor.capture());
         ProductEntity result = argumentCaptor.getValue();
         //then
-        Mockito.verify(jpaProductRepository).findProductById(product.getId());
+        Mockito.verify(jpaProductRepository).findById(product.getId());
         assertEquals("Milk", result.getName());
     }
 
@@ -49,8 +49,8 @@ class DatabaseProductRepositoryTest {
         String name = "Egg";
         ProductEntity productEntity = new ProductEntity(1,"Egg");
         //when
-        Mockito.when(jpaProductRepository.getProductByName(name)).thenReturn(Optional.of(productEntity));
-        Optional<Product> result = databaseProductRepository.getProductByName(name);
+        Mockito.when(jpaProductRepository.findProductByName(name)).thenReturn(Optional.of(productEntity));
+        Optional<Product> result = databaseProductRepository.findProductByName(name);
         //then
         assertTrue(result.isPresent());
         assertEquals("Egg", result.get().getName());

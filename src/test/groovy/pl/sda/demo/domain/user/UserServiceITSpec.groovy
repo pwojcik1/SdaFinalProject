@@ -8,11 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.transaction.annotation.Transactional
 import pl.sda.demo.domain.product.Product
+import pl.sda.demo.domain.product.ProductService
 import pl.sda.demo.domain.recipe.Recipe
+import pl.sda.demo.domain.recipe.RecipeService
 import pl.sda.demo.external.product.JpaProductRepository
-import pl.sda.demo.external.product.ProductEntity
 import pl.sda.demo.external.recipe.JpaRecipeRepository
-import pl.sda.demo.external.recipe.RecipeEntity
 import pl.sda.demo.external.user.DatabaseUserRepository
 import pl.sda.demo.external.user.JpaUserRepository
 import pl.sda.demo.external.user.UserEntity
@@ -31,45 +31,26 @@ class UserServiceITSpec extends Specification {
     @Autowired
     private JpaProductRepository jpaProductRepository
     @Autowired
+    private ProductService productService
+    @Autowired
     private JpaRecipeRepository jpaRecipeRepository
+    @Autowired
+    private RecipeService recipeService
     @Autowired
     private DatabaseUserRepository databaseUserRepository
     @Autowired
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder()
 
-    def setup() {
-        ProductEntity productEntity1 = new ProductEntity(1, "product1")
-        ProductEntity productEntity2 = new ProductEntity(2, "product2")
-        ProductEntity productEntity3 = new ProductEntity(3, "product3")
-        jpaProductRepository.save(productEntity1)
-        jpaProductRepository.save(productEntity2)
-        jpaProductRepository.save(productEntity3)
-
-        RecipeEntity recipeEntity1 = new RecipeEntity(1, "recipe1", "desc1", new HashSet<ProductEntity>())
-        recipeEntity1.products << productEntity1
-        recipeEntity1.products << productEntity2
-        RecipeEntity recipeEntity2 = new RecipeEntity(2, "recipe2", "desc2", new HashSet<ProductEntity>())
-        recipeEntity2.products << productEntity3
-        jpaRecipeRepository.save(recipeEntity1)
-        jpaRecipeRepository.save(recipeEntity2)
-
-        UserEntity userEntity = new UserEntity(1, "username", passwordEncoder.encode("password"), "user", new HashSet<RecipeEntity>(), new HashSet<ProductEntity>())
-        userEntity.products << productEntity3
-        userEntity.products << productEntity2
-        userEntity.favourites << recipeEntity1
-        jpaUserRepository.save(userEntity)
-    }
 
     def "should return user by username"() {
         when:
-        User result = userService.findByUsername("username")
+        User result = userService.findByUsername("user2")
         then:
-        result.username == "username"
-        result.id == 1
-        passwordEncoder.matches("password", result.password)
-        result.productId.size() == 2 && result.productId.contains(2) && result.productId.contains(3)
-        result.recipeId.size() == 1 && result.recipeId.contains(1)
-        result.role == "user"
+        result.username == "user2"
+        result.id == 2
+        result.productId.size() == 2 && result.productId.contains(1) && result.productId.contains(2)
+        result.recipeId.size() == 2 && result.recipeId.contains(2) && result.recipeId.contains(4)
+        result.role == "USER"
     }
 
     def "should throw exception when user with given username doesnt exist"() {
@@ -85,9 +66,9 @@ class UserServiceITSpec extends Specification {
         User user = new User(null, "testUsername", "testPass", new ArrayList<Integer>(), new ArrayList<Integer>(), "user")
         when:
         userService.createUser(user)
-        UserEntity result = jpaUserRepository.getOne(2)
+        UserEntity result = jpaUserRepository.getOne(4)
         then:
-        result.id == 2
+        result.id == 4
         result.username == "testUsername"
         passwordEncoder.matches("testPass", result.password)
         result.favourites.isEmpty()
@@ -96,7 +77,7 @@ class UserServiceITSpec extends Specification {
 
     def "should throw exception if username is taken"() {
         given:
-        User user = new User(1, "username", "pass", new ArrayList<Integer>(), new ArrayList<Integer>(), "user")
+        User user = new User(1, "user1", "pass", new ArrayList<Integer>(), new ArrayList<Integer>(), "user")
         when:
         userService.createUser(user)
         then:
@@ -112,36 +93,36 @@ class UserServiceITSpec extends Specification {
         UserEntity result = jpaUserRepository.getOne(1)
         then:
         result.id == 1
-        result.username == "username"
+        result.username == "user1"
         passwordEncoder.matches("newPassword", result.password)
     }
 
     def "should delete user from db"() {
         when:
         userService.deleteUser(1)
-        Optional<UserEntity> result = jpaUserRepository.getUserByName("username")
+        Optional<UserEntity> result = jpaUserRepository.findUserByName("user1")
         then:
         result.isEmpty()
     }
 
     def "should add product to fridge"() {
         given:
-        User user = userService.findByUsername("username")
-        Product product = new Product(1, "product1")
+        User user = userService.findByUsername("user2")
+        Product product = productService.findProductById(5)
         when:
         userService.addProductToFridge(product, user)
-        User result = userService.findByUsername("username")
+        User result = userService.findByUsername("user2")
         then:
         result.productId.size() == 3
         result.productId.contains(1)
         result.productId.contains(2)
-        result.productId.contains(3)
+        result.productId.contains(5)
     }
 
     def "should throw exception if product is already in fridge"() {
         given:
-        User user = userService.findByUsername("username")
-        Product product = new Product(3, "product3")
+        User user = userService.findByUsername("user2")
+        Product product = productService.findProductById(2)
         when:
         userService.addProductToFridge(product, user)
         then:
@@ -151,13 +132,13 @@ class UserServiceITSpec extends Specification {
 
     def "should remove product from fridge"() {
         given:
-        User user = userService.findByUsername("username")
+        User user = userService.findByUsername("user2")
         when:
-        userService.removeProductFromFridge(3, user)
-        User result = userService.findByUsername("username")
+        userService.removeProductFromFridge(1, user)
+        User result = userService.findByUsername("user2")
         then:
         user.productId.size() == 2
-        user.productId.contains(3)
+        user.productId.contains(1)
         user.productId.contains(2)
         result.productId.size() == 1
         result.productId.contains(2)
@@ -165,9 +146,9 @@ class UserServiceITSpec extends Specification {
 
     def "should throw exception when product is not in fridge"() {
         given:
-        User user = userService.findByUsername("username")
+        User user = userService.findByUsername("user2")
         when:
-        userService.removeProductFromFridge(1, user)
+        userService.removeProductFromFridge(5, user)
         then:
         def e = thrown(IllegalStateException)
         e.message == "You dont have this product in your fridge"
@@ -175,24 +156,22 @@ class UserServiceITSpec extends Specification {
 
     def "should add recipe to favourites"() {
         given:
-        Recipe recipe = new Recipe(2, "recipe2", "desc2", new ArrayList<Integer>())
-        recipe.productId << 3
-        User user = userService.findByUsername("username")
+        User user = userService.findByUsername("user1")
+        Recipe recipe = recipeService.findRecipeById(4)
         when:
         userService.addRecipeToFavourites(recipe, user)
-        User result = userService.findByUsername("username")
+        User result = userService.findByUsername("user1")
         then:
-        result.recipeId.size() == 2
+        result.recipeId.size() == 3
         result.recipeId.contains(1)
         result.recipeId.contains(2)
+        result.recipeId.contains(4)
     }
 
     def "should throw exception if recipe is already in favourites"() {
         given:
-        Recipe recipe = new Recipe(1, "recipe2", "desc2", new ArrayList<Integer>())
-        recipe.productId << 1
-        recipe.productId << 2
-        User user = userService.findByUsername("username")
+        Recipe recipe = recipeService.findRecipeById(2)
+        User user = userService.findByUsername("user1")
         when:
         userService.addRecipeToFavourites(recipe, user)
         then:
@@ -202,20 +181,23 @@ class UserServiceITSpec extends Specification {
 
     def "should delete recipe from favourites"() {
         given:
-        User user = userService.findByUsername("username")
+        User user = userService.findByUsername("user1")
         when:
         userService.deleteRecipeFromFavourites(1, user)
-        User result = userService.findByUsername("username")
+        User result = userService.findByUsername("user1")
         then:
+        user.recipeId.size() == 2
         user.recipeId.contains(1)
-        result.recipeId.isEmpty()
+        user.recipeId.contains(2)
+        result.recipeId.size() == 1
+        result.recipeId.contains(2)
     }
 
     def "should throw exception if recipe is not in favourites"() {
         given:
-        User user = userService.findByUsername("username")
+        User user = userService.findByUsername("user1")
         when:
-        userService.deleteRecipeFromFavourites(2, user)
+        userService.deleteRecipeFromFavourites(3, user)
         then:
         def e = thrown(IllegalStateException)
         e.message == "Recipe is not in favourites"
@@ -223,16 +205,16 @@ class UserServiceITSpec extends Specification {
 
     def "should return all products from fridge"() {
         when:
-        List<Product> result = userService.getAllProductsFromFridge("username")
+        List<Product> result = userService.findAllProductsFromUserFridge("user2")
         then:
         result.size() == 2
-        result.contains(new Product(2, "product2"))
-        result.contains(new Product(3, "product3"))
+        result.contains(productService.findProductById(1))
+        result.contains(productService.findProductById(2))
     }
 
     def "should throw exception when user doesnt exist"() {
         when:
-        userService.getAllProductsFromFridge("user")
+        userService.findAllProductsFromUserFridge("user")
         then:
         def e = thrown(IllegalStateException)
         e.message == "User doesnt exist"
@@ -240,11 +222,10 @@ class UserServiceITSpec extends Specification {
 
     def "should return all favourites"() {
         when:
-        List<Recipe> result = userService.getAllFavourites("username")
-        Recipe recipe = new Recipe(1, "recipe1", "desc1", new ArrayList<Integer>())
-        recipe.productId << 1 << 2
+        List<Recipe> result = userService.findAllUserFavourites("user1")
         then:
-        result.size() == 1
-        result.contains(recipe)
+        result.size() == 2
+        result.contains(recipeService.findRecipeById(1))
+        result.contains(recipeService.findRecipeById(2))
     }
 }

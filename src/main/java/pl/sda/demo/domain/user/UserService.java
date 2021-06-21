@@ -21,7 +21,7 @@ public class UserService {
                     throw new IllegalStateException("Username already taken");
                 });
         user.encodePassword(passwordEncoder, user.getPassword());
-        userRepository.createUser(user);
+        userRepository.addUser(user);
     }
 
     public void updateUser(User user) {
@@ -66,18 +66,18 @@ public class UserService {
         userRepository.deleteRecipeFromFavourites(id, user);
     }
 
-    public List<Product> getAllProductsFromFridge(String username) {
-        if(userRepository.findByUsername(username).isPresent()){
-            return userRepository.getAllProductsFromFridge(username);
+    public List<Product> findAllProductsFromUserFridge(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            return userRepository.findAllProductsFromUserFridge(username);
         }
         throw new IllegalStateException("User doesnt exist");
     }
 
-    public User findByUsername(String username){
-        return userRepository.findByUsername(username).orElseThrow(()-> new IllegalStateException("Wrong username"));
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new IllegalStateException("Wrong username"));
     }
 
-    public List<Recipe> getAllFavourites(String username){
-        return userRepository.getAllFavourites(username);
+    public List<Recipe> findAllUserFavourites(String username) {
+        return userRepository.findAllUserFavourites(username);
     }
 }
