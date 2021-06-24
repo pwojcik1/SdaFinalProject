@@ -40,12 +40,12 @@ public class ProductEndpoint {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<Product> getAllProducts() {
-        return productService.getAllProducts();
+        return productService.findAllProducts();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     Product getById(@PathVariable Integer id) {
-        return productService.getOne(id);
+        return productService.findProductById(id);
     }
 }

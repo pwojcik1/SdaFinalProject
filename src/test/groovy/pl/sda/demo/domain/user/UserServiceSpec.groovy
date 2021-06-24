@@ -23,7 +23,7 @@ class UserServiceSpec extends Specification {
 
         then: "repository is called with expected parameters"
         1 * userRepository.findByUsername("testUser") >> Optional.empty()
-        1 * userRepository.createUser(_ as User) >> { arguments ->
+        1 * userRepository.addUser(_ as User) >> { arguments ->
             assert arguments[0].username == "testUser" &&
                     arguments[0].productId == null &&
                     arguments[0].recipeId == null &&
@@ -44,7 +44,7 @@ class UserServiceSpec extends Specification {
         def e = thrown(IllegalStateException)
         e.message == "Username already taken"
 
-        0 * userRepository.createUser(_)
+        0 * userRepository.addUser(_)
     }
 
     def "should update user in db"() {
@@ -198,16 +198,16 @@ class UserServiceSpec extends Specification {
 
     def "should return all products from fridge"(){
         when:
-        userService.getAllProductsFromFridge("username")
+        userService.findAllProductsFromUserFridge("username")
 
         then:
         1 * userRepository.findByUsername("username") >> Optional.of(new User())
-        1 * userRepository.getAllProductsFromFridge("username")
+        1 * userRepository.findAllProductsFromUserFridge("username")
     }
 
     def "should throw exception if user doesnt exists"(){
         when: "trying to get products form fridge of nonexistent user"
-        userService.getAllProductsFromFridge("username")
+        userService.findAllProductsFromUserFridge("username")
         then: "exception is thrown"
         1 * userRepository.findByUsername("username") >> Optional.empty()
         def e = thrown(IllegalStateException)

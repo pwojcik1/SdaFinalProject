@@ -10,11 +10,9 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import pl.sda.demo.external.product.JpaProductRepository
-import pl.sda.demo.external.product.ProductEntity
 import pl.sda.demo.external.recipe.JpaRecipeRepository
 import pl.sda.demo.external.recipe.RecipeEntity
 import pl.sda.demo.external.user.JpaUserRepository
-import pl.sda.demo.external.user.UserEntity
 import spock.lang.Specification
 
 import javax.transaction.Transactional
@@ -37,83 +35,57 @@ class FavouritesEndpointITSpec extends Specification {
     @Autowired
     private JpaUserRepository jpaUserRepository
 
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     def "test should add recipe to favourites"() {
-        given:
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), new HashSet<>())
-        jpaUserRepository.save(userEntity)
-
-        ProductEntity productEntity = new ProductEntity(1, "product")
-        jpaProductRepository.save(productEntity)
-
-        Set<ProductEntity> productEntities = new HashSet<>() << productEntity
-
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities)
-        jpaRecipeRepository.save(recipeEntity)
-
         expect:
         mockMvc.perform(MockMvcRequestBuilders.post("/api/favourites")
                 .param("id", "1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
 
-        List<RecipeEntity> result = jpaRecipeRepository.findAllFavourites("username")
-        result.size() == 1
-        result.contains(recipeEntity)
+        List<RecipeEntity> result = jpaRecipeRepository.findAllUserFavourites("user2")
+        result.size() == 3
+        result.contains(jpaRecipeRepository.getOne(1))
+        result.contains(jpaRecipeRepository.getOne(2))
+        result.contains(jpaRecipeRepository.getOne(4))
     }
 
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     def "test should remove recipe from favourites"() {
-        given:
-        ProductEntity productEntity = new ProductEntity(1, "product")
-        jpaProductRepository.save(productEntity)
-
-        Set<ProductEntity> productEntities = new HashSet<>() << productEntity
-
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities)
-        jpaRecipeRepository.save(recipeEntity)
-
-        Set<RecipeEntity> favourites = new HashSet<>() << recipeEntity
-
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", favourites, new HashSet<>())
-        jpaUserRepository.save(userEntity)
-
         expect:
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/favourites")
-                .param("id", "1")
+                .param("id", "2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(204))
 
-        List<RecipeEntity> result = jpaRecipeRepository.findAllFavourites("username")
-        result.isEmpty()
+        List<RecipeEntity> result = jpaRecipeRepository.findAllUserFavourites("user2")
+        result.size() == 1
+        result.contains(jpaRecipeRepository.getOne(4))
     }
 
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     def "test should return all favourites"() {
-        given:
-        ProductEntity productEntity = new ProductEntity(1, "product")
-        jpaProductRepository.save(productEntity)
-
-        Set<ProductEntity> productEntities = new HashSet<>() << productEntity
-
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities)
-        jpaRecipeRepository.save(recipeEntity)
-
-        Set<RecipeEntity> favourites = new HashSet<>() << recipeEntity
-
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", favourites, new HashSet<>())
-        jpaUserRepository.save(userEntity)
-
         expect:
         mockMvc.perform(MockMvcRequestBuilders.get("/api/favourites")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.size()').value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].id').value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].name').value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].description').value("desc"))
-                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId.size()').value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.size()').value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].id').value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].name').value("Recipe2"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].description').value("description for recipe2"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId.size()').value(4))
                 .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId[0]').value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId[1]').value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId[2]').value(8))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[0].productId[3]').value(9))
+
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].id').value(4))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].name').value("Recipe4"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].description').value("description for recipe4"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].productId.size()').value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].productId[0]').value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].productId[1]').value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.[1].productId[2]').value(7))
     }
 
 }

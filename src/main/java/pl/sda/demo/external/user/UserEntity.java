@@ -1,6 +1,9 @@
 package pl.sda.demo.external.user;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.sda.demo.domain.user.User;
 import pl.sda.demo.external.product.ProductEntity;
 import pl.sda.demo.external.recipe.RecipeEntity;
@@ -11,10 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
+@Data
 @Entity
-@Setter
-@ToString
 @Table(name = "users")
 public class UserEntity {
     @Id
@@ -35,7 +36,8 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "prouctId"))
     private Set<ProductEntity> products;
-    public void updateFromDomain(User user){
+
+    public void updateFromDomain(User user) {
         this.password = user.getPassword();
     }
 }

@@ -55,7 +55,7 @@ class UserServiceTest {
         //when
         Mockito.when(userRepository.findByUsername("username")).thenReturn(Optional.empty());
         userService.createUser(user);
-        Mockito.verify(userRepository).createUser(userArgumentCaptor.capture());
+        Mockito.verify(userRepository).addUser(userArgumentCaptor.capture());
         User result = userArgumentCaptor.getValue();
         //then
         Mockito.verify(userRepository).findByUsername("username");
@@ -74,7 +74,7 @@ class UserServiceTest {
         //then
         Mockito.verify(userRepository).findByUsername("username");
         assertEquals("Username already taken", ex.getMessage());
-        Mockito.verify(userRepository, Mockito.never()).createUser(user);
+        Mockito.verify(userRepository, Mockito.never()).addUser(user);
     }
 
     @Test
@@ -173,12 +173,12 @@ class UserServiceTest {
         products.add(product1);
         products.add(product2);
         //when
-        Mockito.when(userRepository.getAllProductsFromFridge(username)).thenReturn(products);
+        Mockito.when(userRepository.findAllProductsFromUserFridge(username)).thenReturn(products);
         Mockito.when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User()));
-        List<Product> result = userService.getAllProductsFromFridge(username);
+        List<Product> result = userService.findAllProductsFromUserFridge(username);
         //then
         Mockito.verify(userRepository).findByUsername(username);
-        Mockito.verify(userRepository).getAllProductsFromFridge(username);
+        Mockito.verify(userRepository).findAllProductsFromUserFridge(username);
         assertEquals(products, result);
     }
     @Test
@@ -187,7 +187,7 @@ class UserServiceTest {
         String username = "user";
         //when
         Mockito.when(userRepository.findByUsername("username")).thenReturn(Optional.empty());
-        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> userService.getAllProductsFromFridge(username));
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> userService.findAllProductsFromUserFridge(username));
         //then
         Mockito.verify(userRepository).findByUsername(username);
         assertEquals("User doesnt exist", ex.getMessage());

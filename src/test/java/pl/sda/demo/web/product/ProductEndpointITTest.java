@@ -36,8 +36,6 @@ class ProductEndpointITTest {
     @Test
     @WithMockUser(roles = {"ADMIN"})
     void testShouldCreateProduct() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct");
-        jpaProductRepository.save(productEntity);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/product")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
@@ -46,9 +44,9 @@ class ProductEndpointITTest {
                         "}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
-        Optional<ProductEntity> newProduct = jpaProductRepository.getProductByName("NewProduct");
+        Optional<ProductEntity> newProduct = jpaProductRepository.findProductByName("NewProduct");
         assertTrue(newProduct.isPresent());
-        assertEquals(2, newProduct.get().getId());
+        assertEquals(10, newProduct.get().getId());
         assertEquals("NewProduct", newProduct.get().getName());
     }
 
@@ -63,7 +61,7 @@ class ProductEndpointITTest {
                         "}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(403));
-        Optional<ProductEntity> newProduct = jpaProductRepository.getProductByName("NewProduct");
+        Optional<ProductEntity> newProduct = jpaProductRepository.findProductByName("NewProduct");
         assertTrue(newProduct.isEmpty());
     }
 
@@ -71,38 +69,33 @@ class ProductEndpointITTest {
     @WithMockUser(roles = {"ADMIN"})
     void testShouldDeleteProduct() throws Exception {
 
-        ProductEntity productEntity = new ProductEntity(null, "testProduct");
-        jpaProductRepository.save(productEntity);
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/product")
-                .param("id", "1")
+                .param("id", "2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(204));
 
-        Optional<ProductEntity> newProduct = jpaProductRepository.getProductByName("testProduct");
+        Optional<ProductEntity> newProduct = jpaProductRepository.findProductByName("Product2");
         assertTrue(newProduct.isEmpty());
     }
 
     @Test
     @WithMockUser()
     void testShouldNotDeleteProductIfUserIsNotAdmin() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct");
-        jpaProductRepository.save(productEntity);
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/product")
                 .param("id", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(403));
-        Optional<ProductEntity> newProduct = jpaProductRepository.getProductByName("testProduct");
+        Optional<ProductEntity> newProduct = jpaProductRepository.findProductByName("Product1");
         assertTrue(newProduct.isPresent());
     }
 
     @Test
     @WithMockUser(roles = {"ADMIN"})
     void testShouldUpdateProduct() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct");
-        jpaProductRepository.save(productEntity);
+
         mockMvc.perform(MockMvcRequestBuilders.put("/api/product")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
@@ -111,7 +104,7 @@ class ProductEndpointITTest {
                         "}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
-        Optional<ProductEntity> product = jpaProductRepository.getProductByName("NewProductName");
+        Optional<ProductEntity> product = jpaProductRepository.findProductByName("NewProductName");
         assertTrue(product.isPresent());
         assertEquals(1, product.get().getId());
         assertEquals("NewProductName", product.get().getName());
@@ -120,8 +113,6 @@ class ProductEndpointITTest {
     @Test
     @WithMockUser()
     void testShouldNotUpdateProductIfUserIsNotAdmin() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct");
-        jpaProductRepository.save(productEntity);
         mockMvc.perform(MockMvcRequestBuilders.put("/api/product")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
@@ -130,42 +121,49 @@ class ProductEndpointITTest {
                         "}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(403));
-        Optional<ProductEntity> product = jpaProductRepository.getProductByName("NewProductName");
+        Optional<ProductEntity> product = jpaProductRepository.findProductByName("NewProductName");
         assertTrue(product.isEmpty());
     }
 
     @Test
     @WithMockUser()
     void testShouldReturnAllProducts() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct1");
-        jpaProductRepository.save(productEntity);
-        ProductEntity productEntity2 = new ProductEntity(null, "testProduct2");
-        jpaProductRepository.save(productEntity2);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/product")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().is(200))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(9))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("testProduct1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("Product1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[1].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("testProduct2"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("Product2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[2].id").value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[2].name").value("Product3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[3].id").value(4))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[3].name").value("Product4"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[4].id").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[4].name").value("Product5"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[5].id").value(6))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[5].name").value("Product6"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[6].id").value(7))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[6].name").value("Product7"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[7].id").value(8))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[7].name").value("Product8"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[8].id").value(9))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[8].name").value("Product9"));
     }
 
     @Test
     @WithMockUser()
     void testShouldReturnProductById() throws Exception {
-        ProductEntity productEntity = new ProductEntity(null, "testProduct1");
-        jpaProductRepository.save(productEntity);
-        ProductEntity productEntity2 = new ProductEntity(null, "testProduct2");
-        jpaProductRepository.save(productEntity2);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/product/{id}", "2")
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/product/{id}", "7")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().is(200))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("testProduct2"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(7))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Product7"));
     }
 }

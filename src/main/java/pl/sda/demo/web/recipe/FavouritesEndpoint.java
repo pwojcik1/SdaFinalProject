@@ -8,6 +8,8 @@ import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.domain.recipe.RecipeService;
 import pl.sda.demo.domain.user.User;
 import pl.sda.demo.domain.user.UserService;
+import pl.sda.demo.dto.ApiMapService;
+import pl.sda.demo.dto.RecipeDto;
 
 import java.util.List;
 
@@ -18,29 +20,32 @@ public class FavouritesEndpoint {
 
     private final RecipeService recipeService;
     private final UserService userService;
+    private final ApiMapService apiMapService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     void addToFavourites(@RequestParam Integer id) {
-        Recipe recipe = recipeService.getOne(id);
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.getUsername());
+        Recipe recipe = recipeService.findRecipeById(id);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
         userService.addRecipeToFavourites(recipe, user);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void removeFromFavourites(@RequestParam Integer id) {
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.getUsername());
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
         userService.deleteRecipeFromFavourites(id, user);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<Recipe> getAllFavourites() {
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userService.findByUsername(principal.getUsername());
-        return userService.getAllFavourites(user.getUsername());
+    List<RecipeDto> getAllFavourites() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findByUsername(principal.toString());
+        List<Recipe> allRecipes = userService.findAllUserFavourites(user.getUsername());
+        return apiMapService.mapToRecipeDto(allRecipes);
+
     }
 }

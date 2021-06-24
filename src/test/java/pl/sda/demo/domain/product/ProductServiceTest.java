@@ -18,11 +18,11 @@ public class ProductServiceTest {
     void testShouldAddProductToLibrary() {
         //given
         Product product = new Product(null, "Egg");
-        Mockito.when(productRepository.getProductByName("Egg")).thenReturn(Optional.empty());
+        Mockito.when(productRepository.findProductByName("Egg")).thenReturn(Optional.empty());
         //when
         productService.addProductToLibrary(product);
         //then
-        Mockito.verify(productRepository).getProductByName("Egg");
+        Mockito.verify(productRepository).findProductByName("Egg");
         Mockito.verify(productRepository).addProductToLibrary(product);
     }
 
@@ -30,11 +30,11 @@ public class ProductServiceTest {
     void testShouldThrowExceptionIfProductAlreadyExists() {
         //given
         Product product = new Product(null, "Egg");
-        Mockito.when(productRepository.getProductByName("Egg")).thenReturn(Optional.of(product));
+        Mockito.when(productRepository.findProductByName("Egg")).thenReturn(Optional.of(product));
         //when
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> productService.addProductToLibrary(product));
         //then
-        Mockito.verify(productRepository).getProductByName("Egg");
+        Mockito.verify(productRepository).findProductByName("Egg");
         assertEquals("Product with same name already exists", ex.getMessage());
         Mockito.verify(productRepository, Mockito.never()).addProductToLibrary(product);
     }
@@ -44,13 +44,13 @@ public class ProductServiceTest {
         //given
         Product product = new Product(1, "Eggs");
         //when
-        Mockito.when(productRepository.getOne(product.getId())).thenReturn(Optional.of(new Product(1, "Egg")));
+        Mockito.when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(new Product(1, "Egg")));
         productService.updateProductInLibrary(product);
 
         Mockito.verify(productRepository).updateProductInLibrary(argumentCaptor.capture());
         Product result = argumentCaptor.getValue();
         //then
-        Mockito.verify(productRepository).getOne(1);
+        Mockito.verify(productRepository).findProductById(1);
         assertEquals(1, result.getId());
         assertEquals("Eggs", result.getName());
     }
@@ -60,10 +60,10 @@ public class ProductServiceTest {
         //given
         Product product = new Product(1, "Eggs");
         //when
-        Mockito.when(productRepository.getOne(product.getId())).thenReturn(Optional.of(new Product(2, "Egg")));
+        Mockito.when(productRepository.findProductById(product.getId())).thenReturn(Optional.of(new Product(2, "Egg")));
         IllegalStateException ex = assertThrows(IllegalStateException.class, () ->productService.updateProductInLibrary(product));
         //then
-        Mockito.verify(productRepository).getOne(1);
+        Mockito.verify(productRepository).findProductById(1);
         assertEquals("Cannot update product with different id", ex.getMessage());
         Mockito.verify(productRepository, Mockito.never()).updateProductInLibrary(product);
     }
@@ -73,10 +73,10 @@ public class ProductServiceTest {
         //given
         int id = 1;
         //when
-        Mockito.when(productRepository.getOne(id)).thenReturn(Optional.of(new Product(1,"name")));
-        Product result = productService.getOne(id);
+        Mockito.when(productRepository.findProductById(id)).thenReturn(Optional.of(new Product(1,"name")));
+        Product result = productService.findProductById(id);
         //then
-        Mockito.verify(productRepository).getOne(id);
+        Mockito.verify(productRepository).findProductById(id);
         assertEquals(1, result.getId());
         assertEquals("name", result.getName());
     }
@@ -86,10 +86,10 @@ public class ProductServiceTest {
         //given
         int id = 1;
         //when
-        Mockito.when(productRepository.getOne(id)).thenReturn(Optional.empty());
-        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> productService.getOne(id));
+        Mockito.when(productRepository.findProductById(id)).thenReturn(Optional.empty());
+        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> productService.findProductById(id));
         //then
-        Mockito.verify(productRepository).getOne(id);
+        Mockito.verify(productRepository).findProductById(id);
         assertEquals("Product with given id doesnt exist", ex.getMessage());
     }
 }

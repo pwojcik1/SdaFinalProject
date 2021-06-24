@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import pl.sda.demo.domain.product.Product;
 import pl.sda.demo.domain.recipe.Recipe;
@@ -90,12 +89,12 @@ class DatabaseRecipeRepositoryTest {
                 .products(productEntities)
                 .build();
         //when
-        Mockito.when(jpaRecipeRepository.findRecipeById(1)).thenReturn(Optional.of(recipeEntity));
+        Mockito.when(jpaRecipeRepository.findById(1)).thenReturn(Optional.of(recipeEntity));
         Mockito.when(jpaProductRepository.findAllProductsByIdInList(recipe.getProductId())).thenReturn(returnProducts);
 
         databaseRecipeRepository.updateRecipeInDb(recipe);
         //then
-        Mockito.verify(jpaRecipeRepository).findRecipeById(1);
+        Mockito.verify(jpaRecipeRepository).findById(1);
         Mockito.verify(jpaProductRepository).findAllProductsByIdInList(recipe.getProductId());
         Mockito.verify(jpaRecipeRepository).save(recipeEntityArgumentCaptor.capture());
 
@@ -129,12 +128,12 @@ class DatabaseRecipeRepositoryTest {
                 .products(productEntities)
                 .build();
         //when
-        Mockito.when(jpaRecipeRepository.getRecipeByName("Kanapka")).thenReturn(Optional.of(recipeEntity));
+        Mockito.when(jpaRecipeRepository.findRecipeByName("Kanapka")).thenReturn(Optional.of(recipeEntity));
         Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts())).thenReturn(productIds);
 
-        Optional<Recipe> result = databaseRecipeRepository.findByRecipeName("Kanapka");
+        Optional<Recipe> result = databaseRecipeRepository.findRecipeByName("Kanapka");
         //then
-        Mockito.verify(jpaRecipeRepository).getRecipeByName("Kanapka");
+        Mockito.verify(jpaRecipeRepository).findRecipeByName("Kanapka");
         Mockito.verify(jpaProductRepository).findAllProductsIdFromCollection(recipeEntity.getProducts());
         assertTrue(result.isPresent());
         Assertions.assertEquals("Kanapka", result.get().getName());
@@ -223,7 +222,7 @@ class DatabaseRecipeRepositoryTest {
         Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity1.getProducts())).thenReturn(firstRecipeProducts);
         Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity2.getProducts())).thenReturn(secondRecipeProducts);
 
-        Set<Recipe> result = databaseRecipeRepository.findByProducts(products);
+        Set<Recipe> result = databaseRecipeRepository.findRecipeByProducts(products);
         //then
         Mockito.verify(jpaRecipeRepository).findAllRecipesByProducts(productsInFridge);
         Mockito.verify(jpaProductRepository).findAllProductsIdFromCollection(recipeEntity1.getProducts());
@@ -292,7 +291,7 @@ class DatabaseRecipeRepositoryTest {
         Mockito.when(jpaRecipeRepository.findAll()).thenReturn(recipeEntities);
         Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity1.getProducts())).thenReturn(firstRecipeProducts);
         Mockito.when(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity2.getProducts())).thenReturn(secondRecipeProducts);
-        List<Recipe> result = databaseRecipeRepository.getAllRecipes();
+        List<Recipe> result = databaseRecipeRepository.findAllRecipes();
         //then
         Mockito.verify(jpaRecipeRepository).findAll();
         assertEquals(2, result.size());

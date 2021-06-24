@@ -10,18 +10,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import pl.sda.demo.external.product.JpaProductRepository;
-import pl.sda.demo.external.product.ProductEntity;
 import pl.sda.demo.external.recipe.JpaRecipeRepository;
 import pl.sda.demo.external.recipe.RecipeEntity;
-import pl.sda.demo.external.user.JpaUserRepository;
-import pl.sda.demo.external.user.UserEntity;
 
 import javax.transaction.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,82 +29,57 @@ class FavouritesEndpointITTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaProductRepository jpaProductRepository;
-
-    @Autowired
     private JpaRecipeRepository jpaRecipeRepository;
 
-    @Autowired
-    private JpaUserRepository jpaUserRepository;
-
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user1")
     void testShouldAddRecipeToFavourites() throws Exception {
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", new HashSet<>(), new HashSet<>());
-        jpaUserRepository.save(userEntity);
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
-        Set<ProductEntity> productEntities = new HashSet<>();
-        productEntities.add(productEntity);
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities);
-        jpaRecipeRepository.save(recipeEntity);
-
         mockMvc.perform(MockMvcRequestBuilders.post("/api/favourites")
-                .param("id", "1")
+                .param("id", "3")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
-        List<RecipeEntity> result = jpaRecipeRepository.findAllFavourites("username");
-        assertEquals(1, result.size());
-        assertTrue(result.contains(recipeEntity));
+        List<RecipeEntity> result = jpaRecipeRepository.findAllUserFavourites("user1");
+        assertEquals(3, result.size());
+        assertTrue(result.contains(jpaRecipeRepository.getOne(1)));
+        assertTrue(result.contains(jpaRecipeRepository.getOne(2)));
+        assertTrue(result.contains(jpaRecipeRepository.getOne(3)));
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user1")
     void testShouldRemoveRecipeFromFavourites() throws Exception {
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
-        Set<ProductEntity> productEntities = new HashSet<>();
-        productEntities.add(productEntity);
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities);
-        jpaRecipeRepository.save(recipeEntity);
-        Set<RecipeEntity> favourites = new HashSet<>();
-        favourites.add(recipeEntity);
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", favourites, new HashSet<>());
-        jpaUserRepository.save(userEntity);
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/favourites")
                 .param("id", "1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(204));
 
-        List<RecipeEntity> result = jpaRecipeRepository.findAllFavourites("username");
-        assertTrue(result.isEmpty());
+        List<RecipeEntity> result = jpaRecipeRepository.findAllUserFavourites("user1");
+        assertEquals(1, result.size());
+        assertTrue(result.contains(jpaRecipeRepository.getOne(2)));
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = "user2")
     void testShouldReturnAllFavourites() throws Exception{
-        ProductEntity productEntity = new ProductEntity(1, "product");
-        jpaProductRepository.save(productEntity);
-        Set<ProductEntity> productEntities = new HashSet<>();
-        productEntities.add(productEntity);
-        RecipeEntity recipeEntity = new RecipeEntity(1, "name", "desc", productEntities);
-        jpaRecipeRepository.save(recipeEntity);
-        Set<RecipeEntity> favourites = new HashSet<>();
-        favourites.add(recipeEntity);
-        UserEntity userEntity = new UserEntity(null, "username", "pass", "USER", favourites, new HashSet<>());
-        jpaUserRepository.save(userEntity);
-
         mockMvc.perform(MockMvcRequestBuilders.get("/api/favourites")
         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].description").value("desc"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId.size()").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[0]").value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value("Recipe2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].description").value("description for recipe2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId.size()").value(4))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[0]").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[1]").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[2]").value(8))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].productId[3]").value(9))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].id").value(4))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].name").value("Recipe4"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].description").value("description for recipe4"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].productId.size()").value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].productId[0]").value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].productId[1]").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[1].productId[2]").value(7));
     }
-
 }

@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pl.sda.demo.dto.api.ApiMapService;
-import pl.sda.demo.dto.api.LoginRq;
+import pl.sda.demo.dto.ApiMapService;
+import pl.sda.demo.dto.LoginRq;
 
 import java.util.Collections;
 

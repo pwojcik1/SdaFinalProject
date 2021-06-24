@@ -22,12 +22,12 @@ class RecipeServiceTest {
         ids.add(1);
         Recipe recipe = new Recipe(null, "recipe", "description", ids);
         //when
-        Mockito.when(recipeRepository.findByRecipeName(recipe.getName())).thenReturn(Optional.empty());
+        Mockito.when(recipeRepository.findRecipeByName(recipe.getName())).thenReturn(Optional.empty());
         recipeService.addRecipeToDb(recipe);
         Mockito.verify(recipeRepository).addRecipeToDb(argumentCaptor.capture());
         Recipe result = argumentCaptor.getValue();
         //then
-        Mockito.verify(recipeRepository).findByRecipeName("recipe");
+        Mockito.verify(recipeRepository).findRecipeByName("recipe");
         Mockito.verify(recipeRepository).addRecipeToDb(recipe);
         assertEquals(1, result.getProductId().size());
         assertTrue(result.getProductId().contains(1));
@@ -38,11 +38,11 @@ class RecipeServiceTest {
         List<Integer> ids = new ArrayList<>();
         ids.add(1);
         Recipe recipe = new Recipe(1, "recipe", "description", ids);
-        Mockito.when(recipeRepository.findByRecipeName(recipe.getName())).thenReturn(Optional.of(recipe));
+        Mockito.when(recipeRepository.findRecipeByName(recipe.getName())).thenReturn(Optional.of(recipe));
         //when
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> recipeService.addRecipeToDb(recipe));
         //then
-        Mockito.verify(recipeRepository).findByRecipeName("recipe");
+        Mockito.verify(recipeRepository).findRecipeByName("recipe");
         assertEquals("Recipe with same name already exists", ex.getMessage());
         Mockito.verify(recipeRepository, Mockito.never()).addRecipeToDb(recipe);
     }
@@ -57,13 +57,13 @@ class RecipeServiceTest {
         newIds.add(2);
         Recipe recipe = new Recipe(1, "anotherRecipe", "newDescription", newIds);
         //when
-        Mockito.when(recipeRepository.findByRecipeId(recipe.getId())).thenReturn(Optional.of(new Recipe(1, "recipe", "description", ids )));
+        Mockito.when(recipeRepository.findRecipeById(recipe.getId())).thenReturn(Optional.of(new Recipe(1, "recipe", "description", ids )));
         recipeService.updateRecipeInDb(recipe);
 
         Mockito.verify(recipeRepository).updateRecipeInDb(argumentCaptor.capture());
         Recipe result = argumentCaptor.getValue();
         //then
-        Mockito.verify(recipeRepository).findByRecipeId(recipe.getId());
+        Mockito.verify(recipeRepository).findRecipeById(recipe.getId());
         assertEquals(1, result.getId());
         assertEquals("anotherRecipe", result.getName());
         assertEquals("newDescription", result.getDescription());
@@ -78,10 +78,10 @@ class RecipeServiceTest {
         ids.add(1);
         Recipe recipe = new Recipe(1, "recipe", "description", ids);
         //when
-        Mockito.when(recipeRepository.findByRecipeId(recipe.getId())).thenReturn(Optional.of(new Recipe(2, "recipe", "description", ids )));
+        Mockito.when(recipeRepository.findRecipeById(recipe.getId())).thenReturn(Optional.of(new Recipe(2, "recipe", "description", ids )));
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> recipeService.updateRecipeInDb(recipe));
         //then
-        Mockito.verify(recipeRepository).findByRecipeId(recipe.getId());
+        Mockito.verify(recipeRepository).findRecipeById(recipe.getId());
         assertEquals("Cannot update product with different id", ex.getMessage());
         Mockito.verify(recipeRepository, Mockito.never()).updateRecipeInDb(recipe);
     }
@@ -94,10 +94,10 @@ class RecipeServiceTest {
         ids.add(1);
         Recipe recipe = new Recipe(1, "testRecipe", "description", ids);
         //when
-        Mockito.when(recipeRepository.findByRecipeName(name)).thenReturn(Optional.of(recipe));
-        Recipe result = recipeService.findByRecipeName(name);
+        Mockito.when(recipeRepository.findRecipeByName(name)).thenReturn(Optional.of(recipe));
+        Recipe result = recipeService.findRecipeByName(name);
         //then
-        Mockito.verify(recipeRepository).findByRecipeName(name);
+        Mockito.verify(recipeRepository).findRecipeByName(name);
         assertEquals(1, result.getId());
         assertEquals("testRecipe", result.getName());
         assertEquals("description", result.getDescription());
@@ -110,8 +110,8 @@ class RecipeServiceTest {
         //given
         String name = "nonexistentRecipe";
         //when
-        Mockito.when(recipeRepository.findByRecipeName(name)).thenReturn(Optional.empty());
-        IllegalStateException ex = assertThrows(IllegalStateException.class, ()->recipeService.findByRecipeName(name));
+        Mockito.when(recipeRepository.findRecipeByName(name)).thenReturn(Optional.empty());
+        IllegalStateException ex = assertThrows(IllegalStateException.class, ()->recipeService.findRecipeByName(name));
         //then
         assertEquals("recipe with given name doesnt exist", ex.getMessage());
     }
@@ -120,10 +120,10 @@ class RecipeServiceTest {
     void testShouldReturnOneRecipe(){
         //given
         //when
-        Mockito.when(recipeRepository.findByRecipeId(1)).thenReturn(Optional.of(new Recipe(1,"recipe1", "description", new ArrayList<>())));
-        Recipe result = recipeService.getOne(1);
+        Mockito.when(recipeRepository.findRecipeById(1)).thenReturn(Optional.of(new Recipe(1,"recipe1", "description", new ArrayList<>())));
+        Recipe result = recipeService.findRecipeById(1);
         //then
-        Mockito.verify(recipeRepository).findByRecipeId(1);
+        Mockito.verify(recipeRepository).findRecipeById(1);
         assertEquals(1, result.getId());
         assertEquals("recipe1", result.getName());
         assertEquals("description", result.getDescription());
@@ -134,10 +134,10 @@ class RecipeServiceTest {
     void testShouldThrowExceptionIfIdIsIncorrect(){
         //given
         //when
-        Mockito.when(recipeRepository.findByRecipeId(1)).thenReturn(Optional.empty());
-        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> recipeService.getOne(1));
+        Mockito.when(recipeRepository.findRecipeById(1)).thenReturn(Optional.empty());
+        IllegalStateException ex = assertThrows(IllegalStateException.class, ()-> recipeService.findRecipeById(1));
         //then
-        Mockito.verify(recipeRepository).findByRecipeId(1);
+        Mockito.verify(recipeRepository).findRecipeById(1);
         assertEquals("Recipe with given id doesnt exist", ex.getMessage());
     }
 

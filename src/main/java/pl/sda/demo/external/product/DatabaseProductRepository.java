@@ -7,6 +7,7 @@ import pl.sda.demo.domain.product.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,7 +25,7 @@ public class DatabaseProductRepository implements ProductRepository {
 
     @Override
     public void updateProductInLibrary(Product product) {
-        jpaProductRepository.findProductById(product.getId())
+        jpaProductRepository.findById(product.getId())
                 .ifPresent(productEntity -> {
                     productEntity.updateFromDomain(product);
                     jpaProductRepository.save(productEntity);
@@ -37,32 +38,37 @@ public class DatabaseProductRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> getProductByName(String name) {
-        return jpaProductRepository.getProductByName(name)
-                .map(productEntity -> Product.builder()
-                        .id(productEntity.getId())
-                        .name(productEntity.getName())
-                        .build());
+    public Optional<Product> findProductByName(String name) {
+        return jpaProductRepository.findProductByName(name)
+                .map(entityToProduct());
     }
 
     @Override
-    public List<Product> getAllProducts() {
+    public List<Product> findAllProducts() {
         return jpaProductRepository.findAll()
                 .stream()
-                .map(ent -> new Product(ent.getId(), ent.getName())).collect(Collectors.toList());
+                .map(entityToProduct())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Product> getOne(int id) {
+    public Optional<Product> findProductById(int id) {
         return jpaProductRepository.findById(id)
-                .map(ent -> new Product(ent.getId(), ent.getName()));
+                .map(entityToProduct());
     }
 
     @Override
-    public List<Product> getAllProductsByIds(List<Integer> ids) {
-        return jpaProductRepository.findAllProductsByIdInList(ids).stream().map(productEntity -> Product.builder()
+    public List<Product> findListOfProductsByIds(List<Integer> ids) {
+        return jpaProductRepository.findAllProductsByIdInList(ids)
+                .stream()
+                .map(entityToProduct())
+                .collect(Collectors.toList());
+    }
+
+    private Function<ProductEntity, Product> entityToProduct() {
+        return productEntity -> Product.builder()
                 .id(productEntity.getId())
                 .name(productEntity.getName())
-                .build()).collect(Collectors.toList());
+                .build();
     }
 }

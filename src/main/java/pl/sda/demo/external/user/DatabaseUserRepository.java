@@ -13,6 +13,7 @@ import pl.sda.demo.external.recipe.RecipeEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -23,15 +24,19 @@ public class DatabaseUserRepository implements UserRepository {
     private final JpaRecipeRepository jpaRecipeRepository;
 
     @Override
-    public void createUser(User user) {
-        UserEntity userEntity = UserEntity.builder()
+    public void addUser(User user) {
+        UserEntity userEntity = createUser(user);
+        jpaUserRepository.save(userEntity);
+    }
+
+    private UserEntity createUser(User user) {
+        return UserEntity.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .role(user.getRole())
                 .favourites(jpaRecipeRepository.findAllRecipesByIdInCollection(user.getRecipeId()))
                 .products(jpaProductRepository.findAllProductsByIdInList(user.getProductId()))
                 .build();
-        jpaUserRepository.save(userEntity);
     }
 
     @Override
@@ -64,7 +69,7 @@ public class DatabaseUserRepository implements UserRepository {
     @Override
     public void removeProductFromFridge(int id, User user) {
         Optional<UserEntity> userEntity = jpaUserRepository.findById(user.getId());
-        Optional<ProductEntity> productEntity = jpaProductRepository.findProductById(id);
+        Optional<ProductEntity> productEntity = jpaProductRepository.findById(id);
         userEntity.ifPresent(ent -> {
             if (productEntity.isPresent()) {
                 ent.getProducts().remove(productEntity.get());
@@ -93,7 +98,7 @@ public class DatabaseUserRepository implements UserRepository {
     @Override
     public void deleteRecipeFromFavourites(int id, User user) {  //test do tego poprawic
         UserEntity userEntity = jpaUserRepository.getOne(user.getId());
-        Optional<RecipeEntity> recipeEntity = jpaRecipeRepository.findRecipeById(id);
+        Optional<RecipeEntity> recipeEntity = jpaRecipeRepository.findById(id);
         if (recipeEntity.isPresent()) {
             if (userEntity.getFavourites().contains(recipeEntity.get())) {
                 userEntity.getFavourites().remove(recipeEntity.get());
@@ -108,51 +113,48 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return jpaUserRepository.getUserByName(username)
-                .map(ent -> User.builder()
-                        .id(ent.getId())
-                        .username(ent.getUsername())
-                        .password(ent.getPassword())
-                        .role(ent.getRole())
-                        .productId(jpaProductRepository.findAllProductsIdFromCollection(ent.getProducts()))
-                        .recipeId(jpaRecipeRepository.findAllRecipesIdFromCollection(ent.getFavourites()))
-                        .build());
+        return jpaUserRepository.findUserByName(username)
+                .map(entityToUser());
+    }
+    private Function<UserEntity, User> entityToUser() {
+        return userEntity -> User.builder()
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
+                .password(userEntity.getPassword())
+                .role(userEntity.getRole())
+                .productId(jpaProductRepository.findAllProductsIdFromCollection(userEntity.getProducts()))
+                .recipeId(jpaRecipeRepository.findAllRecipesIdFromCollection(userEntity.getFavourites()))
+                .build();
     }
 
     @Override
-    public Optional<Product> getProductFromFridgeByName(String name, User user) {
-        UserEntity userEntity = jpaUserRepository.getOne(user.getId());
-        Optional<ProductEntity> productEntity = jpaProductRepository.getProductByName(name);
-        if (productEntity.isPresent()) {
-            if (userEntity.getProducts().contains(productEntity.get())) {
-                return productEntity.map(ent -> Product.builder()
-                        .id(ent.getId())
-                        .name(ent.getName())
-                        .build());
-            }
-            throw new IllegalStateException("You dont have this product in fridge");
-        }
-        throw new IllegalStateException("Product with given name doesnt exist");
-    }
-
-    @Override
-    public List<Recipe> getAllFavourites(String username) {
-        return jpaRecipeRepository.findAllFavourites(username)
+    public List<Recipe> findAllUserFavourites(String username) {
+        return jpaRecipeRepository.findAllUserFavourites(username)
                 .stream()
-                .map(recipeEntity -> Recipe.builder()
-                        .id(recipeEntity.getId())
-                        .name(recipeEntity.getName())
-                        .description(recipeEntity.getDescription())
-                        .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
-                        .build())
+                .map(entityToRecipe())
+                .collect(Collectors.toList());
+    }
+    private Function<RecipeEntity, Recipe> entityToRecipe() {
+        return recipeEntity -> Recipe.builder()
+                .id(recipeEntity.getId())
+                .name(recipeEntity.getName())
+                .description(recipeEntity.getDescription())
+                .productId(jpaProductRepository.findAllProductsIdFromCollection(recipeEntity.getProducts()))
+                .build();
+    }
+
+    @Override
+    public List<Product> findAllProductsFromUserFridge(String username) {
+        return jpaProductRepository.findAllProductsFromUserFridge(username)
+                .stream()
+                .map(entityToProduct())
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Product> getAllProductsFromFridge(String username) {
-        return jpaProductRepository.getAllProductsFromFridge(username)
-                .stream()
-                .map(ent -> new Product(ent.getId(), ent.getName()))
-                .collect(Collectors.toList());
+    private Function<ProductEntity, Product> entityToProduct() {
+        return productEntity -> Product.builder()
+                .id(productEntity.getId())
+                .name(productEntity.getName())
+                .build();
     }
 }

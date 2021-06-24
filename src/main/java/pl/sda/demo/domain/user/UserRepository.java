@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
-    void createUser(User user);
+    void addUser(User user);
 
     void updateUser(User user);
 
@@ -23,9 +23,7 @@ public interface UserRepository {
 
     Optional<User> findByUsername(String username);
 
-    List<Product> getAllProductsFromFridge(String username);
+    List<Product> findAllProductsFromUserFridge(String username);
 
-    Optional<Product> getProductFromFridgeByName(String name, User user);
-
-    List<Recipe> getAllFavourites(String username);
+    List<Recipe> findAllUserFavourites(String username);
 }

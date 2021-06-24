@@ -15,7 +15,7 @@ class RecipeServiceSpec extends Specification {
         recipeService.addRecipeToDb(recipe)
 
         then:
-        1 * recipeRepository.findByRecipeName(recipe.getName()) >> Optional.empty()
+        1 * recipeRepository.findRecipeByName(recipe.getName()) >> Optional.empty()
         1 * recipeRepository.addRecipeToDb(recipe)
     }
 
@@ -27,7 +27,7 @@ class RecipeServiceSpec extends Specification {
         recipeService.addRecipeToDb(recipe)
 
         then:
-        1 * recipeRepository.findByRecipeName(recipe.getName()) >> Optional.of(new Recipe())
+        1 * recipeRepository.findRecipeByName(recipe.getName()) >> Optional.of(new Recipe())
         def e = thrown(IllegalStateException)
         e.message == "Recipe with same name already exists"
         0 * recipeRepository.addRecipeToDb(recipe)
@@ -41,7 +41,7 @@ class RecipeServiceSpec extends Specification {
         when:
         recipeService.updateRecipeInDb(recipe)
         then:
-        1 * recipeRepository.findByRecipeId(recipe.getId()) >> Optional.of(new Recipe(1, "recipeName", "recipeDescription", new ArrayList<>()))
+        1 * recipeRepository.findRecipeById(recipe.getId()) >> Optional.of(new Recipe(1, "recipeName", "recipeDescription", new ArrayList<>()))
         1 * recipeRepository.updateRecipeInDb(recipe)
     }
 
@@ -51,7 +51,7 @@ class RecipeServiceSpec extends Specification {
         when:
         recipeService.updateRecipeInDb(recipe)
         then:
-        1 * recipeRepository.findByRecipeId(recipe.getId()) >> Optional.of(new Recipe(2, "recipeName", "recipeDescription", new ArrayList<>()))
+        1 * recipeRepository.findRecipeById(recipe.getId()) >> Optional.of(new Recipe(2, "recipeName", "recipeDescription", new ArrayList<>()))
         def e = thrown(IllegalStateException)
         e.message == "Cannot update product with different id"
         0 * recipeRepository.updateRecipeInDb(recipe)
@@ -59,17 +59,17 @@ class RecipeServiceSpec extends Specification {
 
     def "should throw exception when recipe with given name doesnt exist"() {
         when:
-        recipeService.findByRecipeName("recipeName")
+        recipeService.findRecipeByName("recipeName")
         then:
-        1 * recipeRepository.findByRecipeName("recipeName") >> Optional.empty()
+        1 * recipeRepository.findRecipeByName("recipeName") >> Optional.empty()
         def e = thrown(IllegalStateException)
         e.message == "recipe with given name doesnt exist"
     }
     def "should throw exception when recipe with given id doesnt exist"() {
         when:
-        recipeService.getOne(1)
+        recipeService.findRecipeById(1)
         then:
-        1 * recipeRepository.findByRecipeId(1) >> Optional.empty()
+        1 * recipeRepository.findRecipeById(1) >> Optional.empty()
         def e = thrown(IllegalStateException)
         e.message == "Recipe with given id doesnt exist"
     }

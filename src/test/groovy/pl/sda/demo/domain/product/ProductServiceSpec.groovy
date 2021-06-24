@@ -15,7 +15,7 @@ class ProductServiceSpec extends Specification {
         productService.addProductToLibrary(product)
 
         then: "repository is called with expected parameters"
-        1 * productRepository.getProductByName("productName") >> Optional.empty()
+        1 * productRepository.findProductByName("productName") >> Optional.empty()
         1 * productRepository.addProductToLibrary(product)
     }
 
@@ -27,7 +27,7 @@ class ProductServiceSpec extends Specification {
         productService.addProductToLibrary(product)
 
         then: "exception is thrown"
-        1 * productRepository.getProductByName("productName") >> Optional.of(new Product(1, "productName"))
+        1 * productRepository.findProductByName("productName") >> Optional.of(new Product(1, "productName"))
 
         def e = thrown(IllegalStateException)
         e.message == "Product with same name already exists"
@@ -43,7 +43,7 @@ class ProductServiceSpec extends Specification {
         productService.updateProductInLibrary(product)
 
         then: "repository is called with expected parameters"
-        1 * productRepository.getOne(1) >> Optional.of(new Product(1, "productName"))
+        1 * productRepository.findProductById(1) >> Optional.of(new Product(1, "productName"))
         1 * productRepository.updateProductInLibrary(product)
     }
 
@@ -55,7 +55,7 @@ class ProductServiceSpec extends Specification {
         productService.updateProductInLibrary(product)
 
         then: "exception is thrown"
-        1 * productRepository.getOne(1) >> Optional.of(new Product(2, "productName"))
+        1 * productRepository.findProductById(1) >> Optional.of(new Product(2, "productName"))
 
         def e = thrown(IllegalStateException)
         e.message == "Cannot update product with different id"
@@ -65,10 +65,10 @@ class ProductServiceSpec extends Specification {
 
     def "should return one product by id"() {
         when: "service tries to get product"
-        def result = productService.getOne(2)
+        def result = productService.findProductById(2)
 
         then: "correct product is returned"
-        1 * productRepository.getOne(2) >> Optional.of(new Product(2, "testName"))
+        1 * productRepository.findProductById(2) >> Optional.of(new Product(2, "testName"))
 
         result.id == 2
         result.name == "testName"
@@ -76,10 +76,10 @@ class ProductServiceSpec extends Specification {
 
     def "should throw exception when product with given id doesnt exists"(){
         when: "service tries to return product"
-        productService.getOne(2)
+        productService.findProductById(2)
 
         then: "exception is thrown"
-        1 * productRepository.getOne(2) >> Optional.empty()
+        1 * productRepository.findProductById(2) >> Optional.empty()
 
         def e = thrown(IllegalStateException)
         e.message == "Product with given id doesnt exist"

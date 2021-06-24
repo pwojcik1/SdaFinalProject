@@ -42,9 +42,9 @@ class RegisterEndpointITSpec extends Specification {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(201))
 
-        UserEntity user = jpaUserRepository.getOne(1)
+        UserEntity user = jpaUserRepository.getOne(4)
 
-        user.getId() == 1
+        user.getId() == 4
         user.getUsername() == "username"
         user.getRole() == "ADMIN"
         passwordEncoder.matches("password", user.getPassword())

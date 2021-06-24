@@ -45,9 +45,9 @@ class RegisterEndpointTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(201));
 
-        UserEntity user = jpaUserRepository.getOne(1);
+        UserEntity user = jpaUserRepository.getOne(4);
 
-        assertEquals(1, user.getId());
+        assertEquals(4, user.getId());
         assertEquals("username", user.getUsername());
         assertEquals("ADMIN", user.getRole());
         assertTrue(passwordEncoder.matches("password", user.getPassword()));

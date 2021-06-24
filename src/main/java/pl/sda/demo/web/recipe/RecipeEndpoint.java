@@ -6,6 +6,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.sda.demo.domain.recipe.Recipe;
 import pl.sda.demo.domain.recipe.RecipeService;
+import pl.sda.demo.dto.ApiMapService;
+import pl.sda.demo.dto.RecipeDto;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class RecipeEndpoint {
 
     private final RecipeService recipeService;
+    private final ApiMapService apiMapService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,27 +29,28 @@ public class RecipeEndpoint {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
-    void deleteRecipe(@RequestParam Integer id){
+    void deleteRecipe(@RequestParam Integer id) {
         recipeService.deleteRecipeFromDb(id);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    void updateRecipe(@RequestBody Recipe recipe){
+    void updateRecipe(@RequestBody Recipe recipe) {
         recipeService.updateRecipeInDb(recipe);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<Recipe> getAllRecipes(){
-        return recipeService.getAllRecipes();
+    List<RecipeDto> getAllRecipes() {
+        List<Recipe> allRecipes = recipeService.findAllRecipes();
+        return apiMapService.mapToRecipeDto(allRecipes);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    Recipe getById(@PathVariable Integer id){
-        return recipeService.getOne(id);
+    Recipe getById(@PathVariable Integer id) {
+        return recipeService.findRecipeById(id);
     }
 
 }

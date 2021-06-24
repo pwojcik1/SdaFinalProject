@@ -25,16 +25,14 @@ class ProductServiceITSpec extends Specification {
         Product product = new Product(null, "productName")
         when:
         productService.addProductToLibrary(product)
-        ProductEntity result = jpaProductRepository.getOne(1);
+        ProductEntity result = jpaProductRepository.getOne(10)
         then:
-        result.id == 1
+        result.id == 10
         result.name == "productName"
     }
     def "should throw exception if product already exists"(){
         given:
-        ProductEntity productEntity = new ProductEntity(null, "productName")
-        jpaProductRepository.save(productEntity)
-        Product product = new Product(null, "productName")
+        Product product = new Product(null, "Product1")
         when:
         productService.addProductToLibrary(product)
         then:
@@ -44,9 +42,7 @@ class ProductServiceITSpec extends Specification {
     }
     def "should update product in db"(){
         given:
-        ProductEntity productEntity = new ProductEntity(null, "oldProductName")
         Product product = new Product(1, "newProductName")
-        jpaProductRepository.save(productEntity)
         when:
         productService.updateProductInLibrary(product)
         def result = jpaProductRepository.getOne(1)
@@ -56,67 +52,55 @@ class ProductServiceITSpec extends Specification {
     }
     def "should delete product from db"(){
         given:
-        ProductEntity productEntity = new ProductEntity(null, "productName")
-        jpaProductRepository.save(productEntity)
-        Optional<ProductEntity> before = jpaProductRepository.findById(1)
         when:
         productService.deleteProductFromLibrary(1)
         Optional<ProductEntity> result = jpaProductRepository.findById(1)
         then:
-        before.isPresent()
-        before.get().id == 1
-        before.get().name == "productName"
         result.isEmpty()
     }
 
     def "should return all products"(){
         given:
-        ProductEntity productEntity1 = new ProductEntity(null, "productName1")
-        ProductEntity productEntity2 = new ProductEntity(null, "productName2")
-        jpaProductRepository.save(productEntity1)
-        jpaProductRepository.save(productEntity2)
+
         when:
-        List<Product> result = productService.getAllProducts()
+        List<Product> result = productService.findAllProducts()
         then:
-        result.size() == 2
-        result.contains(new Product(1,"productName1"))
-        result.contains(new Product(2,"productName2"))
+        result.size() == 9
+        result.contains(new Product(1,"Product1"))
+        result.contains(new Product(2,"Product2"))
+        result.contains(new Product(3,"Product3"))
+        result.contains(new Product(4,"Product4"))
+        result.contains(new Product(5,"Product5"))
+        result.contains(new Product(6,"Product6"))
+        result.contains(new Product(7,"Product7"))
+        result.contains(new Product(8,"Product8"))
+        result.contains(new Product(9,"Product9"))
     }
     def "should return product by id"(){
         given:
-        ProductEntity productEntity1 = new ProductEntity(null, "productName1")
-        ProductEntity productEntity2 = new ProductEntity(null, "productName2")
-        jpaProductRepository.save(productEntity1)
-        jpaProductRepository.save(productEntity2)
         when:
-        Product result = productService.getOne(2)
+        Product result = productService.findProductById(2)
         then:
         result.id == 2
-        result.name == "productName2"
+        result.name == "Product2"
     }
 
     def "should throw exception if product with given id doesnt exist"(){
         when:
-        Product result = productService.getOne(1)
+        Product result = productService.findProductById(11)
         then:
         def e = thrown(IllegalStateException)
         e.message == "Product with given id doesnt exist"
     }
     def "should return all products by ids"(){
-        ProductEntity productEntity1 = new ProductEntity(null, "productName1")
-        ProductEntity productEntity2 = new ProductEntity(null, "productName2")
-        ProductEntity productEntity3 = new ProductEntity(null, "productName3")
-        jpaProductRepository.save(productEntity1)
-        jpaProductRepository.save(productEntity2)
-        jpaProductRepository.save(productEntity3)
         List<Integer> ids = new ArrayList<>()
         ids << 1
         ids << 3
         when:
-        List<Product> result = productService.findAllProductsByIds(ids)
+        List<Product> result = productService.findListOfProductsByIds(ids)
         then:
         result.size() == 2
-        result.contains(new Product(1, "productName1"))
-        result.contains(new Product(3, "productName3"))
+        result.contains(new Product(1, "Product1"))
+        result.contains(new Product(3, "Product3"))
     }
 }
